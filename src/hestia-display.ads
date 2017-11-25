@@ -25,6 +25,8 @@ package Hestia.Display is
 
    --  Color to draw a separation line.
    Line_Color : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
+   Hot_Color  : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Red;
+   Cold_Color : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
 
    B_MAIN : constant UI.Buttons.Button_Index := 1;
    B_INFO  : constant UI.Buttons.Button_Index := 2;
