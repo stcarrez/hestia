@@ -169,13 +169,43 @@ package body Hestia.Display is
                                  Height => Buffer.Height));
 
       --  Draw some column header.
-      UI.Texts.Draw_String (Buffer, (100, Y), 150, "Protocol");
-      UI.Texts.Draw_String (Buffer, (150, Y), 100, "Packets", RIGHT);
-      UI.Texts.Draw_String (Buffer, (250, Y), 100, "Bytes", RIGHT);
-      UI.Texts.Draw_String (Buffer, (350, Y), 100, "BW", RIGHT);
+      UI.Texts.Draw_String (Buffer, (100, 30), 250, "Samedi 25 Novembre");
+      UI.Texts.Draw_String (Buffer, (100, 60), 150, "15:56:44");
+--        UI.Texts.Draw_String (Buffer, (150, Y), 100, "Packets", RIGHT);
+--        UI.Texts.Draw_String (Buffer, (250, Y), 100, "Bytes", RIGHT);
+--        UI.Texts.Draw_String (Buffer, (350, Y), 100, "BW", RIGHT);
       Buffer.Set_Source (Line_Color);
       Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 14),
                                    Width => Buffer.Width - 100);
+
+      UI.Texts.Draw_String (Buffer, (100, 80), 150, "Chambres");
+      Buffer.Set_Source (Cold_Color);
+      Buffer.Fill_Rect (Area => (Position => (100, 100),
+                                 Width  => Buffer.Width - 100,
+                                 Height => 50));
+
+      Buffer.Set_Source (Hot_Color);
+      Buffer.Fill_Rect (Area => (Position => (150, 100),
+                                 Width  => 50,
+                                 Height => 50));
+      Buffer.Fill_Rect (Area => (Position => (350, 100),
+                                 Width  => 100,
+                                 Height => 50));
+
+      UI.Texts.Draw_String (Buffer, (100, 160), 150, "Salon");
+      Buffer.Set_Source (Cold_Color);
+      Buffer.Fill_Rect (Area => (Position => (100, 180),
+                                 Width  => Buffer.Width - 100,
+                                 Height => 50));
+
+      Buffer.Set_Source (Hot_Color);
+      Buffer.Fill_Rect (Area => (Position => (150, 180),
+                                 Width  => 50,
+                                 Height => 50));
+      Buffer.Fill_Rect (Area => (Position => (350, 180),
+                                 Width  => 100,
+                                 Height => 50));
+
       UI.Texts.Foreground := HAL.Bitmap.Green;
       UI.Texts.Foreground := HAL.Bitmap.White;
    end Display_Protocols;
