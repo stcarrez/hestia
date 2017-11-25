@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 with System;
 with Interfaces;
+with Ada.Real_Time;
 with Net.Buffers;
 with Net.Interfaces.STM32;
 with Net.DHCP;
@@ -35,6 +36,9 @@ package Hestia.Network is
    --  Initialize and start the network stack.
    procedure Initialize;
 
+   --  Do the network housekeeping and return the next deadline.
+   procedure Process (Deadline : out Ada.Real_Time.Time);
+
 private
 
    --  The task that waits for packets.
@@ -43,8 +47,12 @@ private
      Priority => System.Default_Priority;
 
    type NTP_Client_Type is limited new Net.DNS.Query with record
-      Server : aliased Net.NTP.Client;
-      Port   : Net.Uint16 := Net.NTP.NTP_PORT;
+      --  The TTL deadline for the resolved DNS entry.
+      Ttl_Deadline : Ada.Real_Time.Time;
+
+      --  The NTP client connection and port.
+      Server       : aliased Net.NTP.Client;
+      Port         : Net.Uint16 := Net.NTP.NTP_PORT;
    end record;
 
    --  Save the answer received from the DNS server.  This operation is called for each answer
