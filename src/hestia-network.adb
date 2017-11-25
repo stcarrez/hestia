@@ -15,7 +15,6 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Ada.Real_Time;
 with Ada.Synchronous_Task_Control;
 with Net.Interfaces;
 with Net.Headers;
@@ -27,6 +26,8 @@ with STM32.Eth;
 with STM32.SDRAM;
 
 package body Hestia.Network is
+
+   use type Ada.Real_Time.Time;
 
    Ready  : Ada.Synchronous_Task_Control.Suspension_Object;
 
@@ -54,7 +55,37 @@ package body Hestia.Network is
       --  Initialize the DHCP client.
       Dhcp.Initialize (Ifnet'Access);
 
+      Time_Ntp.Ttl_Deadline := Ada.Real_Time.Clock;
    end Initialize;
+
+   --  ------------------------------
+   --  Do the network housekeeping and return the next deadline.
+   --  ------------------------------
+   procedure Process (Deadline : out Ada.Real_Time.Time) is
+      use type Net.DHCP.State_Type;
+      use type Net.NTP.Status_Type;
+
+      Dhcp_Deadline : Ada.Real_Time.Time;
+      Ntp_Deadline  : Ada.Real_Time.Time;
+      Now           : Ada.Real_Time.Time;
+      Error         : Net.Error_Code;
+   begin
+      Net.Protos.Arp.Timeout (Ifnet);
+      Dhcp.Process (Dhcp_Deadline);
+      Ntp_Deadline := Dhcp_Deadline;
+
+      --  We have an IP address, do the NTP processing.
+      if Dhcp.Get_State in Net.DHCP.STATE_BOUND | Net.DHCP.STATE_RENEWING | Net.DHCP.STATE_REBINDING then
+         Now := Ada.Real_Time.Clock;
+         if Time_Ntp.Ttl_Deadline < Now then
+            Time_Ntp.Ttl_Deadline := Now + Ada.Real_Time.Seconds (5);
+            Time_Ntp.Resolve (Ifnet'Access, "ntp.ubuntu.com", Error);
+         elsif Time_Ntp.Server.Get_Status /= Net.NTP.NOSERVER then
+            Time_Ntp.Server.Process (Ntp_Deadline);
+         end if;
+      end if;
+      Deadline := (if Ntp_Deadline < Dhcp_Deadline then Ntp_Deadline else Dhcp_Deadline);
+   end Process;
 
    --  ------------------------------
    --  Save the answer received from the DNS server.  This operation is called for each answer
@@ -75,6 +106,7 @@ package body Hestia.Network is
       use type Net.Uint16;
    begin
       if Status = Net.DNS.NOERROR and then Response.Of_Type = Net.DNS.A_RR then
+         Request.Ttl_Deadline := Ada.Real_Time.Clock + Ada.Real_Time.Seconds (Natural (Response.Ttl));
          Request.Server.Initialize (Ifnet'Access, Response.Ip, Request.Port);
       end if;
    end Answer;
@@ -83,7 +115,6 @@ package body Hestia.Network is
    --  The task that waits for packets.
    --  ------------------------------
    task body Controller is
-      use type Ada.Real_Time.Time;
       use type Net.Uint16;
 
       Packet  : Net.Buffers.Buffer_Type;
