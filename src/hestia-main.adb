@@ -46,6 +46,8 @@ procedure Hestia.Main is --  with Priority => System.Priority'First is
    --  The network processing deadline.
    Net_Deadline     : Ada.Real_Time.Time;
 
+   Time_Deadline    : Ada.Real_Time.Time;
+
    --  Current display mode.
    Mode             : UI.Buttons.Button_Event := Hestia.Display.B_MAIN;
    Button_Changed   : Boolean := False;
@@ -110,8 +112,12 @@ begin
             end case;
             Hestia.Display.Refresh_Graphs (Buffer.all, Graph_Mode);
             Hestia.Display.Display_Summary (Buffer.all);
-            STM32.Board.Display.Update_Layer (1);
             Refresh_Deadline := Refresh_Deadline + REFRESH_PERIOD;
+            Hestia.Display.Display_Time (Buffer.all, Time_Deadline);
+            if Time_Deadline < Refresh_Deadline then
+               Refresh_Deadline := Time_Deadline;
+            end if;
+            STM32.Board.Display.Update_Layer (1);
          end if;
          Hestia.Network.Process (Net_Deadline);
          delay until Now + Ada.Real_Time.Milliseconds (100);
