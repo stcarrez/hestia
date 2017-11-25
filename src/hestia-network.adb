@@ -88,6 +88,14 @@ package body Hestia.Network is
    end Process;
 
    --  ------------------------------
+   --  Get the NTP time reference.
+   --  ------------------------------
+   function Get_Time return Net.NTP.NTP_Reference is
+   begin
+      return Time_Ntp.Server.Get_Reference;
+   end Get_Time;
+
+   --  ------------------------------
    --  Save the answer received from the DNS server.  This operation is called for each answer
    --  found in the DNS response packet.  The Index is incremented at each answer.  For example
    --  a DNS server can return a CNAME_RR answer followed by an A_RR: the operation is called
