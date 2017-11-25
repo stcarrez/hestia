@@ -43,6 +43,9 @@ procedure Hestia.Main is --  with Priority => System.Priority'First is
    --  Display refresh deadline.
    Refresh_Deadline : Ada.Real_Time.Time;
 
+   --  The network processing deadline.
+   Net_Deadline     : Ada.Real_Time.Time;
+
    --  Current display mode.
    Mode             : UI.Buttons.Button_Event := Hestia.Display.B_MAIN;
    Button_Changed   : Boolean := False;
@@ -110,6 +113,7 @@ begin
             STM32.Board.Display.Update_Layer (1);
             Refresh_Deadline := Refresh_Deadline + REFRESH_PERIOD;
          end if;
+         Hestia.Network.Process (Net_Deadline);
          delay until Now + Ada.Real_Time.Milliseconds (100);
       end;
    end loop;
