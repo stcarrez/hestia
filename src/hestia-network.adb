@@ -57,6 +57,29 @@ package body Hestia.Network is
    end Initialize;
 
    --  ------------------------------
+   --  Save the answer received from the DNS server.  This operation is called for each answer
+   --  found in the DNS response packet.  The Index is incremented at each answer.  For example
+   --  a DNS server can return a CNAME_RR answer followed by an A_RR: the operation is called
+   --  two times.
+   --
+   --  This operation can be overriden to implement specific actions when an answer is received.
+   --  ------------------------------
+   overriding
+   procedure Answer (Request  : in out NTP_Client_Type;
+                     Status   : in Net.DNS.Status_Type;
+                     Response : in Net.DNS.Response_Type;
+                     Index    : in Natural) is
+      pragma Unreferenced (Index);
+      use type Net.DNS.Status_Type;
+      use type Net.DNS.RR_Type;
+      use type Net.Uint16;
+   begin
+      if Status = Net.DNS.NOERROR and then Response.Of_Type = Net.DNS.A_RR then
+         Request.Server.Initialize (Ifnet'Access, Response.Ip, Request.Port);
+      end if;
+   end Answer;
+
+   --  ------------------------------
    --  The task that waits for packets.
    --  ------------------------------
    task body Controller is
