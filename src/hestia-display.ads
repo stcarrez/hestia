@@ -16,7 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with HAL.Bitmap;
-
+with Ada.Real_Time;
 with Net;
 
 with UI.Buttons;
@@ -74,6 +74,9 @@ package Hestia.Display is
 
    --  Display IGMP groups found on the network.
    procedure Display_Groups (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
+
+   procedure Display_Time (Buffer   : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                           Deadline : out Ada.Real_Time.Time);
 
    --  Display a performance summary indicator.
    procedure Display_Summary (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
