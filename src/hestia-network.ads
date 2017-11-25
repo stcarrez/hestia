@@ -39,6 +39,9 @@ package Hestia.Network is
    --  Do the network housekeeping and return the next deadline.
    procedure Process (Deadline : out Ada.Real_Time.Time);
 
+   --  Get the NTP time reference.
+   function Get_Time return Net.NTP.NTP_Reference;
+
 private
 
    --  The task that waits for packets.
