@@ -30,4 +30,7 @@ package Hestia.Ports is
    Zone5_Control : Heat_Control_Point renames STM32.Device.PI0;
    Zone6_Control : Heat_Control_Point renames STM32.Device.PB15;
 
+   --  Initialize the heat control ports.
+   procedure Initialize;
+
 end Hestia.Ports;
