@@ -25,6 +25,7 @@ with HAL.Bitmap;
 with UI.Buttons;
 with Hestia.Network;
 with Hestia.Display;
+with Hestia.Ports;
 
 --  The main EtherScope task must run at a lower priority as it takes care
 --  of displaying results on the screen while the EtherScope receiver's task
@@ -57,6 +58,7 @@ procedure Hestia.Main is --  with Priority => System.Priority'First is
 begin
    --  Initialize the display and draw the main/fixed frames in both buffers.
    Hestia.Display.Initialize;
+   Hestia.Ports.Initialize;
    Hestia.Display.Draw_Frame (STM32.Board.Display.Hidden_Buffer (1).all);
    STM32.Board.Display.Update_Layer (1);
    Hestia.Display.Draw_Frame (STM32.Board.Display.Hidden_Buffer (1).all);
