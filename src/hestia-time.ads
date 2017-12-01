@@ -45,4 +45,18 @@ package Hestia.Time is
    function Convert (Time : in Net.NTP.NTP_Reference) return Date_Time with
      Pre => Time.Status in Net.NTP.SYNCED | Net.NTP.RESYNC;
 
+   Month_Names : constant array (Month_Name) of String (1 .. 9) :=
+     ("Janvier  ",
+      "Février ",
+      "Mars     ",
+      "Avril    ",
+      "Mai      ",
+      "Juin     ",
+      "Juillet  ",
+      "Aout     ",
+      "Septembre",
+      "Octobre  ",
+      "Novembre ",
+      "Décembre");
+
 end Hestia.Time;
