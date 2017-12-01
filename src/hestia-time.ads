@@ -15,9 +15,34 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with Net.NTP;
 package Hestia.Time is
 
+   type Month_Name is (January, February, March, April, May, June, July, August,
+                       September, October, November, December);
    type Day_Name is (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday);
+   subtype Day_Number      is Natural range 1 .. 31;
+   subtype Hour_Number     is Natural range 0 .. 23;
+   subtype Minute_Number   is Natural range 0 .. 59;
+   subtype Second_Number   is Natural range 0 .. 59;
+   subtype Year_Number     is Natural range 1901 .. 2399;
+
+   type Time_Offset is range -(28 * 60) .. 28 * 60;
+
+   type Date_Time is record
+      Hour     : Hour_Number;
+      Minute   : Minute_Number;
+      Second   : Second_Number;
+      Sub_Seconds : Net.Uint32 := 0;
+      Week_Day : Day_Name;
+      Year_Day : Natural;
+      Day      : Day_Number;
+      Month    : Month_Name;
+      Year     : Year_Number;
+   end record;
+
+   --  Convert the NTP time reference to a date.
+   function Convert (Time : in Net.NTP.NTP_Reference) return Date_Time with
+     Pre => Time.Status in Net.NTP.SYNCED | Net.NTP.RESYNC;
 
 end Hestia.Time;
