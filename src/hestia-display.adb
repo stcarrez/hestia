@@ -22,6 +22,7 @@ with BMP_Fonts;
 with Interfaces;
 with UI.Texts;
 with Hestia.Network;
+with Hestia.Time;
 with Net.NTP;
 
 package body Hestia.Display is
@@ -34,8 +35,8 @@ package body Hestia.Display is
    --  Convert the integer to a string without a leading space.
    function Image (Value : in Net.Uint32) return String;
    function Image (Value : in Net.Uint64) return String;
-   function To_Digits (Val : Net.Uint32) return String;
-   function To_String (H, M, S : Net.Uint32) return String;
+   function To_Digits (Val : Natural) return String;
+   function To_String (H, M, S : Natural) return String;
 
    --  Kb, Mb, Gb units.
    KB : constant Net.Uint64 := 1024;
@@ -57,7 +58,7 @@ package body Hestia.Display is
 
    Dec_String : constant String := "0123456789";
 
-   function To_Digits (Val : Net.Uint32) return String is
+   function To_Digits (Val : Natural) return String is
       Result : String (1 .. 2);
    begin
       Result (1) := Dec_String (Positive ((Val / 10) + 1));
@@ -65,7 +66,7 @@ package body Hestia.Display is
       return Result;
    end To_Digits;
 
-   function To_String (H, M, S : Net.Uint32) return String is
+   function To_String (H, M, S : Natural) return String is
    begin
       return To_Digits (H) & ":" & To_Digits (M) & ":" & To_Digits (S);
    end To_String;
@@ -186,7 +187,7 @@ package body Hestia.Display is
                                  Height => Buffer.Height));
 
       --  Draw some column header.
-      UI.Texts.Draw_String (Buffer, (100, 30), 250, "Samedi 25 Novembre");
+--      UI.Texts.Draw_String (Buffer, (100, 30), 250, "Samedi 25 Novembre");
 --        UI.Texts.Draw_String (Buffer, (150, Y), 100, "Packets", RIGHT);
 --        UI.Texts.Draw_String (Buffer, (250, Y), 100, "Bytes", RIGHT);
 --        UI.Texts.Draw_String (Buffer, (350, Y), 100, "BW", RIGHT);
@@ -294,27 +295,22 @@ package body Hestia.Display is
    procedure Display_Time (Buffer   : in out HAL.Bitmap.Bitmap_Buffer'Class;
                            Deadline : out Ada.Real_Time.Time) is
       Ref  : constant Net.NTP.NTP_Reference := Hestia.Network.Get_Time;
-      T    : Net.NTP.NTP_Timestamp;
-      H    : Net.Uint32;
-      M    : Net.Uint32;
-      S    : Net.Uint32;
       W    : Net.Uint64;
+      T    : Hestia.Time.Date_Time;
    begin
       if not (Ref.Status in Net.NTP.SYNCED | Net.NTP.RESYNC) then
          Deadline := Ada.Real_Time.Clock + Ada.Real_Time.Seconds (1);
       else
-         T := Net.NTP.Get_Time (Ref);
-         S := T.Seconds mod 86400;
-         H := S / 3600;
-         S := S mod 3600;
-         M := S / 60;
-         S := S mod 60;
+         T := Hestia.Time.Convert (Ref);
          W := Net.Uint64 (Net.Uint32'Last - T.Sub_Seconds);
          W := Interfaces.Shift_Right (W * 1_000_000, 32);
          Deadline := Ada.Real_Time.Clock + Ada.Real_Time.Microseconds (Integer (W));
 
          UI.Texts.Current_Font := BMP_Fonts.Font16x24;
-         UI.Texts.Draw_String (Buffer, (105, 60), 175, To_String (H, M, S));
+         UI.Texts.Draw_String (Buffer, (105, 60), 175, To_String (T.Hour, T.Minute, T.Second));
+         UI.Texts.Draw_String (Buffer, (105, 30), 175, Natural'Image (T.Year));
+         UI.Texts.Draw_String (Buffer, (205, 30), 175, Natural'Image (T.Day));
+         UI.Texts.Draw_String (Buffer, (300, 30), 175, Hestia.Time.Month_Names (T.Month));
          UI.Texts.Current_Font := BMP_Fonts.Font12x12;
       end if;
    end Display_Time;
