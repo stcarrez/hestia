@@ -24,7 +24,7 @@ with UI.Texts;
 with Hestia.Network;
 with Hestia.Time;
 with Net.NTP;
-
+with Hestia.Scheduler;
 package body Hestia.Display is
 
    use type Interfaces.Unsigned_32;
@@ -210,18 +210,8 @@ package body Hestia.Display is
                                  Height => 50));
 
       UI.Texts.Draw_String (Buffer, (100, 160), 150, "Salon");
-      Buffer.Set_Source (Cold_Color);
-      Buffer.Fill_Rect (Area => (Position => (100, 180),
-                                 Width  => Buffer.Width - 100,
-                                 Height => 50));
 
       Buffer.Set_Source (Hot_Color);
-      Buffer.Fill_Rect (Area => (Position => (150, 180),
-                                 Width  => 50,
-                                 Height => 50));
-      Buffer.Fill_Rect (Area => (Position => (350, 180),
-                                 Width  => 100,
-                                 Height => 50));
 
       UI.Texts.Foreground := HAL.Bitmap.Green;
       UI.Texts.Foreground := HAL.Bitmap.White;
@@ -312,6 +302,7 @@ package body Hestia.Display is
          UI.Texts.Draw_String (Buffer, (205, 30), 175, Natural'Image (T.Day));
          UI.Texts.Draw_String (Buffer, (300, 30), 175, Hestia.Time.Month_Names (T.Month));
          UI.Texts.Current_Font := BMP_Fonts.Font12x12;
+         Hestia.Scheduler.Display (Buffer, T);
       end if;
    end Display_Time;
 
