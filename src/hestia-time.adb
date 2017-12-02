@@ -89,6 +89,7 @@ package body Hestia.Time is
       Result.Minute := Minute_Number (S / 60);
       Result.Second := Second_Number (S mod 60);
       Result.Sub_Seconds := T.Sub_Seconds;
+      Result.Week_Day := Monday;
       return Result;
    end Convert;
 
