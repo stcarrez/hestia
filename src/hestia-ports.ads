@@ -18,7 +18,12 @@
 with STM32;
 with STM32.GPIO;
 with STM32.Device;
+with Hestia.Config;
 package Hestia.Ports is
+
+   type Zone_Type is new Natural range 1 .. Hestia.Config.MAX_ZONES;
+
+   type Control_Type is (H_CONFORT, H_ECO, H_HORS_GEL, H_STOPPED, H_CONFORT_M1, H_CONFORT_M2);
 
    subtype Heat_Control_Point is STM32.GPIO.GPIO_Point;
 
@@ -30,7 +35,21 @@ package Hestia.Ports is
    Zone5_Control : Heat_Control_Point renames STM32.Device.PI0;
    Zone6_Control : Heat_Control_Point renames STM32.Device.PB15;
 
+   --  Set the zone.
+   procedure Set_Zone (Zone : in Zone_Type;
+                       Mode : in Control_Type);
+
    --  Initialize the heat control ports.
    procedure Initialize;
+
+private
+
+   type Zone_Control_Type is limited record
+      Mode        : Control_Type;
+      Pos_Control : Heat_Control_Point;
+      Neg_Control : Heat_Control_Point;
+   end record;
+
+   type Zone_Control_Array is array (Zone_Type) of Zone_Control_Type;
 
 end Hestia.Ports;
