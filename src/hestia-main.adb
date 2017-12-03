@@ -54,7 +54,7 @@ procedure Hestia.Main is --  with Priority => System.Priority'First is
    Button_Changed   : Boolean := False;
 
    --  Display the Ethernet graph (all traffic).
-   Graph_Mode       : Hestia.Display.Graph_Kind := Hestia.Display.G_ZONE1;
+   --  Graph_Mode       : Hestia.Display.Graph_Kind := Hestia.Display.G_ZONE1;
 begin
    --  Initialize the display and draw the main/fixed frames in both buffers.
    Hestia.Display.Initialize;
@@ -102,12 +102,12 @@ begin
             case Mode is
                when Hestia.Display.B_MAIN =>
                   Hestia.Display.Display_Main (Buffer.all);
-                  Graph_Mode := Hestia.Display.G_ZONE1;
-                  Hestia.Display.Refresh_Graphs (Buffer.all, Graph_Mode);
+                  --  Graph_Mode := Hestia.Display.G_ZONE1;
+                  --  Hestia.Display.Refresh_Graphs (Buffer.all, Graph_Mode);
 
                when Hestia.Display.B_SETUP =>
                   Hestia.Display.Display_Setup (Buffer.all);
-                  Graph_Mode := Hestia.Display.G_ZONE2;
+                  --  Graph_Mode := Hestia.Display.G_ZONE2;
 
                when others =>
                   null;
