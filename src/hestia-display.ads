@@ -63,8 +63,8 @@ package Hestia.Display is
    procedure Refresh_Graphs (Buffer     : in out HAL.Bitmap.Bitmap_Buffer'Class;
                              Graph_Mode : in Graph_Kind);
 
-   --  Display devices found on the network.
-   procedure Display_Devices (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
+   --  Display the current heat schedule and status.
+   procedure Display_Main (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Display the schedule setup.
    procedure Display_Setup (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
