@@ -187,91 +187,15 @@ package body Hestia.Display is
                                  Height => Buffer.Height));
 
       --  Draw some column header.
---      UI.Texts.Draw_String (Buffer, (100, 30), 250, "Samedi 25 Novembre");
---        UI.Texts.Draw_String (Buffer, (150, Y), 100, "Packets", RIGHT);
---        UI.Texts.Draw_String (Buffer, (250, Y), 100, "Bytes", RIGHT);
---        UI.Texts.Draw_String (Buffer, (350, Y), 100, "BW", RIGHT);
       Buffer.Set_Source (Line_Color);
       Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 14),
                                    Width => Buffer.Width - 100);
-
-      UI.Texts.Draw_String (Buffer, (100, 80), 150, "Chambres");
-      Buffer.Set_Source (Cold_Color);
-      Buffer.Fill_Rect (Area => (Position => (100, 100),
-                                 Width  => Buffer.Width - 100,
-                                 Height => 50));
-
-      Buffer.Set_Source (Hot_Color);
-      Buffer.Fill_Rect (Area => (Position => (150, 100),
-                                 Width  => 50,
-                                 Height => 50));
-      Buffer.Fill_Rect (Area => (Position => (350, 100),
-                                 Width  => 100,
-                                 Height => 50));
-
-      UI.Texts.Draw_String (Buffer, (100, 160), 150, "Salon");
 
       Buffer.Set_Source (Hot_Color);
 
       UI.Texts.Foreground := HAL.Bitmap.Green;
       UI.Texts.Foreground := HAL.Bitmap.White;
    end Display_Protocols;
-
-   --  ------------------------------
-   --  Display IGMP groups found on the network.
-   --  ------------------------------
-   procedure Display_Groups (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
-      Y : constant Natural := 0;
-   begin
-      Buffer.Set_Source (UI.Texts.Background);
-      Buffer.Fill_Rect (Area => (Position => (100, 0),
-                                 Width  => Buffer.Width - 100,
-                                 Height => Buffer.Height));
-
-      --  Draw some column header.
-      UI.Texts.Draw_String (Buffer, (105, Y), 175, "IP");
-      UI.Texts.Draw_String (Buffer, (180, Y), 100, "Packets", RIGHT);
-      UI.Texts.Draw_String (Buffer, (280, Y), 100, "Bytes", RIGHT);
-      UI.Texts.Draw_String (Buffer, (380, Y), 100, "Bandwidth", RIGHT);
-      Buffer.Set_Source (Line_Color);
-      Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 14),
-                                   Width => Buffer.Width - 100);
-
-      UI.Texts.Foreground := HAL.Bitmap.Green;
-
-      UI.Texts.Foreground := HAL.Bitmap.White;
-   end Display_Groups;
-
-   --  ------------------------------
-   --  Display TCP/IP information found on the network.
-   --  ------------------------------
-   procedure Display_TCP (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
-      Y : Natural := 0;
-
-   begin
-      Buffer.Set_Source (UI.Texts.Background);
-      Buffer.Fill_Rect (Area  => (Position => (100, 0),
-                                  Width  => Buffer.Width - 100,
-                                  Height => Buffer.Height));
-
-      --  Draw some column header.
-      UI.Texts.Draw_String (Buffer, (105, Y), 175, "TCP Port");
-      UI.Texts.Draw_String (Buffer, (180, Y), 100, "Packets", RIGHT);
-      UI.Texts.Draw_String (Buffer, (280, Y), 100, "Bytes", RIGHT);
-      UI.Texts.Draw_String (Buffer, (380, Y), 100, "Bandwidth", RIGHT);
-      Buffer.Set_Source (Line_Color);
-      Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 14),
-                                   Width => Buffer.Width - 100);
-      Y := Y + 18;
-
-      UI.Texts.Foreground := HAL.Bitmap.Green;
-      UI.Texts.Draw_String (Buffer, (105, Y), 175, "All");
-
-      Buffer.Set_Source (Line_Color);
-      Buffer.Draw_Horizontal_Line (Pt    => (100, 25),
-                                   Width => Buffer.Width - 100);
-      UI.Texts.Foreground := HAL.Bitmap.White;
-   end Display_TCP;
 
    use Ada.Real_Time;
    Prev_Time : Ada.Real_Time.Time := Ada.Real_Time.Clock;
