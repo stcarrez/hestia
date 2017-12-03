@@ -12,6 +12,9 @@ hestia: ada-enet/anet_stm32fxxx.gpr
 flash:		all
 	st-flash write hestia.bin 0x8000000
 
+clean:
+	rm -rf obj
+
 checkout:
 	git submodule init
 	git submodule update
