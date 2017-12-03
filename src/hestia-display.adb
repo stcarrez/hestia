@@ -177,9 +177,9 @@ package body Hestia.Display is
    --  ------------------------------
    --  Display devices found on the network.
    --  ------------------------------
-   procedure Display_Protocols (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
-      Y      : constant Natural := 0;
-
+   procedure Display_Setup (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
+      Y  : constant Natural := 0;
+      W  : Natural := Buffer.Width;
    begin
       Buffer.Set_Source (UI.Texts.Background);
       Buffer.Fill_Rect (Area => (Position => (100, 0),
@@ -191,11 +191,26 @@ package body Hestia.Display is
       Buffer.Draw_Horizontal_Line (Pt    => (100, Y + 14),
                                    Width => Buffer.Width - 100);
 
+      UI.Texts.Draw_String (Buffer, (200, 60), 175, "Lundi");
       Buffer.Set_Source (Hot_Color);
+      Buffer.Fill_Rect (Area => (Position => (100, 100),
+                                 Width  => Buffer.Width - 100,
+                                 Height => 40));
+      Buffer.Fill_Rect (Area => (Position => (100, 200),
+                                 Width  => Buffer.Width - 100,
+                                 Height => 40));
+      Buffer.Set_Source (HAL.Bitmap.White_Smoke);
+      W := W - 100;
+      for I in 0 .. 11 loop
+         Buffer.Draw_Vertical_Line (Pt     => (100 + (I * W) / 12, 100 - 5),
+                                    Height => 5);
+         Buffer.Draw_Vertical_Line (Pt     => (100 + (I * W) / 12, 200 - 5),
+                                    Height => 5);
+      end loop;
 
       UI.Texts.Foreground := HAL.Bitmap.Green;
       UI.Texts.Foreground := HAL.Bitmap.White;
-   end Display_Protocols;
+   end Display_Setup;
 
    use Ada.Real_Time;
    Prev_Time : Ada.Real_Time.Time := Ada.Real_Time.Clock;
