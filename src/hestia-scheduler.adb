@@ -15,7 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-
+with Hestia.Ports;
 package body Hestia.Scheduler is
 
    type Schedule_Array_Type is array (Scheduler_Index) of Schedule_Type;
@@ -51,6 +51,17 @@ package body Hestia.Scheduler is
 
    begin
       Pos := Schedule_Unit (Date.Hour * 12) + Schedule_Unit (Date.Minute / 5);
+      if Zones (1).Week (Date.Week_Day) (Pos) = ON then
+         Hestia.Ports.Zone1_Control.Set;
+      else
+         Hestia.Ports.Zone1_Control.Clear;
+      end if;
+      if Zones (2).Week (Date.Week_Day) (Pos) = ON then
+         Hestia.Ports.Zone2_Control.Set;
+      else
+         Hestia.Ports.Zone2_Control.Clear;
+      end if;
+
       if Pos >= Schedule_Middle then
          Start := Pos - Schedule_Middle;
       else
@@ -66,7 +77,7 @@ package body Hestia.Scheduler is
                Buffer.Set_Source (Cold_Color);
             end if;
             Buffer.Fill_Rect (Area  => (Position => (X, Y),
-                                        Width  => W / Count,
+                                        Width  => (W / Count) + 1,
                                         Height => 10));
             Y := Y + 20;
          end loop;
@@ -87,6 +98,6 @@ begin
       Zones (1).Week (Day) := (84 .. 264 => ON, others => OFF);
 
       --  On from 7:00 to 10:00 and 18:00 to 22:00.
-      Zones (2).Week (Day) := (84 .. 120 => ON, 216 .. 264 => ON, others => OFF);
+      Zones (2).Week (Day) := (84 .. 120 => ON, 216 .. 260 => ON, others => OFF);
    end loop;
 end Hestia.Scheduler;
