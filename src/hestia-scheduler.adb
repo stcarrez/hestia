@@ -45,7 +45,7 @@ package body Hestia.Scheduler is
       Pos   : Schedule_Unit;
       Start : Schedule_Unit;
       X     : Natural := 100;
-      Y     : Natural := 200;
+      Y     : Natural := 180;
       W     : constant Natural := Buffer.Width - X;
       Count : constant Natural := Natural (Schedule_Unit'Last - Schedule_Unit'First);
 
@@ -58,7 +58,7 @@ package body Hestia.Scheduler is
             Hestia.Ports.Set_Zone (Zone, Hestia.Ports.H_ECO);
          end if;
       end loop;
-      Y := 185;
+      Y := 165;
       for Zone in Zones'Range loop
          UI.Texts.Draw_String (Buffer, (100, Y), 250, Zones (Zone).Name);
          Y := Y + 30;
@@ -70,7 +70,7 @@ package body Hestia.Scheduler is
       end if;
       for I in Schedule_Unit'First .. Schedule_Unit'Last loop
          X := 100 + (Natural (I) * W) / Count;
-         Y := 200;
+         Y := 180;
          for Zone in Zones'Range loop
             if Zones (Zone).Week (Date.Week_Day) (Start) = ON then
                Buffer.Set_Source (Hot_Color);
@@ -95,8 +95,8 @@ package body Hestia.Scheduler is
          end if;
       end loop;
       Buffer.Set_Source (Now_Color);
-      Buffer.Draw_Vertical_Line (Pt     => (100 + W / 2, 200 - 5),
-                                 Height => 30 + 30 + 30);
+      Buffer.Draw_Vertical_Line (Pt     => (100 + W / 2, 180 - 5),
+                                 Height => 30 + 30 + 20);
    end Display;
 
 begin
