@@ -104,8 +104,8 @@ begin
                   Hestia.Display.Display_Devices (Buffer.all);
                   Graph_Mode := Hestia.Display.G_ZONE1;
 
-               when Hestia.Display.B_INFO =>
-                  Hestia.Display.Display_Protocols (Buffer.all);
+               when Hestia.Display.B_SETUP =>
+                  Hestia.Display.Display_Setup (Buffer.all);
                   Graph_Mode := Hestia.Display.G_ZONE2;
 
                when others =>
