@@ -69,12 +69,6 @@ package Hestia.Display is
    --  Display devices found on the network.
    procedure Display_Protocols (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
-   --  Display TCP/IP information found on the network.
-   procedure Display_TCP (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
-
-   --  Display IGMP groups found on the network.
-   procedure Display_Groups (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
-
    procedure Display_Time (Buffer   : in out HAL.Bitmap.Bitmap_Buffer'Class;
                            Deadline : out Ada.Real_Time.Time);
 
