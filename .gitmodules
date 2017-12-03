@@ -1,3 +1,3 @@
 [submodule "ada-enet"]
 	path = ada-enet
-	url = git@github.com:stcarrez/ada-enet.git
+	url = https://github.com/stcarrez/ada-enet.git
