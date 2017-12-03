@@ -16,6 +16,7 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with Interfaces;
+with Hestia.Config;
 package body Hestia.Time is
 
    Secs_In_Day           : constant := 24 * 3600;
@@ -56,6 +57,9 @@ package body Hestia.Time is
    begin
       T := Net.NTP.Get_Time (Time);
       S := T.Seconds;
+
+      --  Apply the timezone correction.
+      S := S + 60 * Hestia.Config.TIME_ZONE_CORRECTION;
 
       --  Compute year.
       Four_Year_Segs := Natural (S / Secs_In_Four_Years);
