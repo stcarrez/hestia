@@ -15,7 +15,7 @@
 --  See the License for the specific language governing permissions and
 --  limitations under the License.
 -----------------------------------------------------------------------
-with Hestia.Ports;
+with UI.Texts;
 package body Hestia.Scheduler is
 
    type Schedule_Array_Type is array (Scheduler_Index) of Schedule_Type;
@@ -51,17 +51,18 @@ package body Hestia.Scheduler is
 
    begin
       Pos := Schedule_Unit (Date.Hour * 12) + Schedule_Unit (Date.Minute / 5);
-      if Zones (1).Week (Date.Week_Day) (Pos) = ON then
-         Hestia.Ports.Zone1_Control.Set;
-      else
-         Hestia.Ports.Zone1_Control.Clear;
-      end if;
-      if Zones (2).Week (Date.Week_Day) (Pos) = ON then
-         Hestia.Ports.Zone2_Control.Set;
-      else
-         Hestia.Ports.Zone2_Control.Clear;
-      end if;
-
+      for Zone in Zones'Range loop
+         if Zones (Zone).Week (Date.Week_Day) (Pos) = ON then
+            Hestia.Ports.Set_Zone (Zone, Hestia.Ports.H_CONFORT);
+         else
+            Hestia.Ports.Set_Zone (Zone, Hestia.Ports.H_ECO);
+         end if;
+      end loop;
+      Y := 185;
+      for Zone in Zones'Range loop
+         UI.Texts.Draw_String (Buffer, (100, Y), 250, Zones (Zone).Name);
+         Y := Y + 30;
+      end loop;
       if Pos >= Schedule_Middle then
          Start := Pos - Schedule_Middle;
       else
@@ -76,10 +77,16 @@ package body Hestia.Scheduler is
             else
                Buffer.Set_Source (Cold_Color);
             end if;
-            Buffer.Fill_Rect (Area  => (Position => (X, Y),
-                                        Width  => (W / Count) + 1,
-                                        Height => 10));
-            Y := Y + 20;
+            if Y + (W / Count) + 1 < W then
+               Buffer.Fill_Rect (Area  => (Position => (X, Y),
+                                           Width  => (W / Count) + 1,
+                                           Height => 10));
+            else
+               Buffer.Fill_Rect (Area  => (Position => (X, Y),
+                                           Width  => (W / Count),
+                                           Height => 10));
+            end if;
+            Y := Y + 30;
          end loop;
          if Start = Schedule_Unit'Last then
             Start := Schedule_Unit'First;
@@ -89,15 +96,21 @@ package body Hestia.Scheduler is
       end loop;
       Buffer.Set_Source (Now_Color);
       Buffer.Draw_Vertical_Line (Pt     => (100 + W / 2, 200 - 5),
-                                 Height => 20 + 20);
+                                 Height => 30 + 30 + 30);
    end Display;
 
 begin
+   Zones (1).Name := "Salon               ";
+   Zones (2).Name := "Chambres            ";
+   Zones (3).Name := "Salles de bains     ";
    for Day in Hestia.Time.Day_Name'Range loop
       --  On from 7:00 to 22:00.
       Zones (1).Week (Day) := (84 .. 264 => ON, others => OFF);
 
       --  On from 7:00 to 10:00 and 18:00 to 22:00.
       Zones (2).Week (Day) := (84 .. 120 => ON, 216 .. 260 => ON, others => OFF);
+
+      --  On from 7:00 to 10:00 and 18:00 to 22:00.
+      Zones (3).Week (Day) := (84 .. 120 => ON, 216 .. 260 => ON, others => OFF);
    end loop;
 end Hestia.Scheduler;
