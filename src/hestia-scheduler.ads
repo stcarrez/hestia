@@ -17,6 +17,7 @@
 -----------------------------------------------------------------------
 
 with Hestia.Time;
+with Hestia.Ports;
 with HAL.Bitmap;
 
 package Hestia.Scheduler is
@@ -25,7 +26,7 @@ package Hestia.Scheduler is
    type State_Type is (ON, OFF);
 
    --  The scheduler index.
-   type Scheduler_Index is new Natural range 1 .. 2;
+   subtype Scheduler_Index is Hestia.Ports.Zone_Type;
 
    function Get_State (Date : in Hestia.Time.Date_Time;
                        Zone : in Scheduler_Index) return State_Type;
@@ -43,6 +44,7 @@ private
    type Week_Schedule is array (Hestia.Time.Day_Name) of Day_Schedule;
 
    type Schedule_Type is limited record
+      Name : String (1 .. 20);
       Week : Week_Schedule;
    end record;
 
