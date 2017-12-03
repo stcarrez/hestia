@@ -87,7 +87,7 @@ package body Hestia.Time is
       Result.Day := Year_Day;
 
       --  Compute hours, minutes and remaining seconds.
-      S := T.Seconds mod 86400;
+      S := S mod 86400;
       Result.Hour := Hour_Number (S / 3600);
       S := S mod 3600;
       Result.Minute := Minute_Number (S / 60);
