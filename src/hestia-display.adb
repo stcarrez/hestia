@@ -164,15 +164,21 @@ package body Hestia.Display is
    end Refresh_Graphs;
 
    --  ------------------------------
-   --  Display devices found on the network.
+   --  Display the current heat schedule and status.
    --  ------------------------------
-   procedure Display_Devices (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
+   procedure Display_Main (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
+      Ref  : constant Net.NTP.NTP_Reference := Hestia.Network.Get_Time;
+      T    : Hestia.Time.Date_Time;
    begin
-      Buffer.Set_Source (UI.Texts.Background);
-      Buffer.Fill_Rect (Area => (Position => (100, 0),
-                                 Width  => Buffer.Width - 100,
-                                 Height => Buffer.Height));
-   end Display_Devices;
+      if Ref.Status in Net.NTP.SYNCED | Net.NTP.RESYNC then
+         T := Hestia.Time.Convert (Ref);
+         Buffer.Set_Source (UI.Texts.Background);
+         Buffer.Fill_Rect (Area => (Position => (100, 0),
+                                    Width  => Buffer.Width - 100,
+                                    Height => Buffer.Height));
+         Hestia.Scheduler.Display (Buffer, T);
+      end if;
+   end Display_Main;
 
    --  ------------------------------
    --  Display devices found on the network.
@@ -207,6 +213,14 @@ package body Hestia.Display is
          Buffer.Draw_Vertical_Line (Pt     => (100 + (I * W) / 12, 200 - 5),
                                     Height => 5);
       end loop;
+      UI.Texts.Foreground := HAL.Bitmap.Green;
+      UI.Texts.Current_Font := BMP_Fonts.Font8x8;
+      UI.Texts.Draw_String (Buffer, (100, 100 - 10), 175, "0h");
+      UI.Texts.Draw_String (Buffer, (100 + 62, 100 - 10), 175, "2h");
+      UI.Texts.Draw_String (Buffer, (100 + 62 * 2 - 8, 100 - 10), 175, "4h");
+      UI.Texts.Draw_String (Buffer, (100 + 62 * 3 - 8, 100 - 10), 175, "6h");
+      UI.Texts.Draw_String (Buffer, (100 + 62 * 4 - 8, 100 - 10), 175, "8h");
+      UI.Texts.Draw_String (Buffer, (100 + 62 * 5 - 12, 100 - 10), 175, "10h");
 
       UI.Texts.Foreground := HAL.Bitmap.Green;
       UI.Texts.Foreground := HAL.Bitmap.White;
@@ -241,7 +255,6 @@ package body Hestia.Display is
          UI.Texts.Draw_String (Buffer, (205, 30), 175, Natural'Image (T.Day));
          UI.Texts.Draw_String (Buffer, (300, 30), 175, Hestia.Time.Month_Names (T.Month));
          UI.Texts.Current_Font := BMP_Fonts.Font12x12;
-         Hestia.Scheduler.Display (Buffer, T);
       end if;
    end Display_Time;
 
