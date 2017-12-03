@@ -28,13 +28,13 @@ package Hestia.Display is
    Hot_Color  : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Red;
    Cold_Color : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
 
-   B_MAIN : constant UI.Buttons.Button_Index := 1;
-   B_INFO  : constant UI.Buttons.Button_Index := 2;
+   B_MAIN  : constant UI.Buttons.Button_Index := 1;
+   B_SETUP : constant UI.Buttons.Button_Index := 2;
    B_STAT  : constant UI.Buttons.Button_Index := 3;
 
    Buttons : UI.Buttons.Button_Array (B_MAIN .. B_STAT) :=
-     (B_MAIN => (Name => "Main ", State => UI.Buttons.B_PRESSED, others => <>),
-      B_INFO  => (Name => "Info ", others => <>),
+     (B_MAIN  => (Name => "Main ", State => UI.Buttons.B_PRESSED, others => <>),
+      B_SETUP => (Name => "Setup", others => <>),
       B_STAT  => (Name => "Stats", others => <>));
 
    package Use_Graph is new UI.Graphs (Value_Type => Net.Uint64,
@@ -66,8 +66,8 @@ package Hestia.Display is
    --  Display devices found on the network.
    procedure Display_Devices (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
-   --  Display devices found on the network.
-   procedure Display_Protocols (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
+   --  Display the schedule setup.
+   procedure Display_Setup (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    procedure Display_Time (Buffer   : in out HAL.Bitmap.Bitmap_Buffer'Class;
                            Deadline : out Ada.Real_Time.Time);
