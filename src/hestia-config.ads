@@ -22,6 +22,6 @@ package Hestia.Config is
    MAX_ZONES : constant := 3;
 
    --  Simple timezone correction (+1 hour, not DST support yet).
-   TIME_ZONE_CORRECTION : constant := 1;
+   TIME_ZONE_CORRECTION : constant := 60;
 
 end Hestia.Config;
