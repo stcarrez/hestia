@@ -101,8 +101,9 @@ begin
          if Refresh_Deadline <= Now or Button_Changed then
             case Mode is
                when Hestia.Display.B_MAIN =>
-                  Hestia.Display.Display_Devices (Buffer.all);
+                  Hestia.Display.Display_Main (Buffer.all);
                   Graph_Mode := Hestia.Display.G_ZONE1;
+                  Hestia.Display.Refresh_Graphs (Buffer.all, Graph_Mode);
 
                when Hestia.Display.B_SETUP =>
                   Hestia.Display.Display_Setup (Buffer.all);
@@ -112,7 +113,6 @@ begin
                   null;
 
             end case;
-            Hestia.Display.Refresh_Graphs (Buffer.all, Graph_Mode);
             Hestia.Display.Display_Summary (Buffer.all);
             Refresh_Deadline := Refresh_Deadline + REFRESH_PERIOD;
             Hestia.Display.Display_Time (Buffer.all, Time_Deadline);
