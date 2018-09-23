@@ -20,7 +20,7 @@ the Makefile provides a target to perform the checkout.  Just run:
   make checkout
 
 You will also need the GNAT Ada compiler for ARM available at http://libre.adacore.com/
-(the GNAT ARM 2017 is used).
+(the GNAT ARM 2018 is used).
 
 # Build
 
