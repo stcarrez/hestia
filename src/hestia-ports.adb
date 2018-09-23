@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  hestia-ports -- Heat port control
---  Copyright (C) 2017 Stephane Carrez
+--  Copyright (C) 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -66,14 +66,14 @@ package body Hestia.Ports is
    --  Initialize the heat control ports.
    --  ------------------------------
    procedure Initialize is
-      Configuration : STM32.GPIO.GPIO_Port_Configuration;
+      Configuration : STM32.GPIO.GPIO_Port_Configuration
+        := (Mode => STM32.GPIO.Mode_Out,
+            Output_Type => STM32.GPIO.Push_Pull,
+            Speed       => STM32.GPIO.Speed_100MHz,
+            Resistors   => STM32.GPIO.Floating);
    begin
       STM32.Device.Enable_Clock (All_Zones);
 
-      Configuration.Mode        := STM32.GPIO.Mode_Out;
-      Configuration.Output_Type := STM32.GPIO.Push_Pull;
-      Configuration.Speed       := STM32.GPIO.Speed_100MHz;
-      Configuration.Resistors   := STM32.GPIO.Floating;
       STM32.GPIO.Configure_IO (All_Zones, Configuration);
    end Initialize;
 
