@@ -47,7 +47,7 @@ package Hestia.Time is
 
    Month_Names : constant array (Month_Name) of String (1 .. 9) :=
      ("Janvier  ",
-      "Février ",
+      "Fevrier  ",
       "Mars     ",
       "Avril    ",
       "Mai      ",
@@ -57,6 +57,15 @@ package Hestia.Time is
       "Septembre",
       "Octobre  ",
       "Novembre ",
-      "Décembre");
+      "Decembre ");
+
+   Day_Names : constant array (Day_Name) of String (1 .. 8) :=
+     ("Lundi   ",
+      "Mardi   ",
+      "Mercredi",
+      "Jeudi   ",
+      "Vendredi",
+      "Samedi  ",
+      "Dimanche");
 
 end Hestia.Time;
