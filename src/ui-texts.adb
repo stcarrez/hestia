@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  ui-texts -- Utilities to draw text strings
---  Copyright (C) 2016, 2017 Stephane Carrez
+--  Copyright (C) 2016, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -87,6 +87,24 @@ package body UI.Texts is
                                             Background => BG);
             end loop;
 
+         when CENTER =>
+            declare
+               L : constant Natural := Get_Width (Msg);
+            begin
+               if L < Width then
+                  X := X + (Width - L) / 2;
+               end if;
+               for C of Msg loop
+                  exit when X > Last;
+                  Bitmapped_Drawing.Draw_Char (Buffer     => Buffer,
+                                               Start      => (X, Y),
+                                               Char       => C,
+                                               Font       => Current_Font,
+                                               Foreground => FG,
+                                               Background => BG);
+                  X := X + Char_Width (C);
+               end loop;
+            end;
       end case;
    end Draw_String;
 
