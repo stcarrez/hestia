@@ -18,44 +18,50 @@
 with Ada.Real_Time;
 
 with HAL.Bitmap;
-with UI.Buttons;
+with HAL.Touch_Panel;
 
 --  == Display ==
 --  The `Display_Type` is a tagged record that defines several operations to handle
 --  the main display and its interaction with the user.
 package UI.Displays is
 
+   type Refresh_Mode is (REFRESH_CURRENT, REFRESH_BOTH);
+
+   type Display_Buffer_Index is new Natural range 0 .. 1;
+
    type Display_Type is abstract tagged limited private;
    type Display_Access is not null access all Display_Type'Class;
 
-   --  Returns True if a refresh is needed.
-   function Need_Refresh (Display : in Display_Type) return Boolean;
+   --  Get the index of current buffer visible on screen.
+   function Current_Buffer_Index (Display : in Display_Type) return Display_Buffer_Index;
 
-   --  Process touch panel event if there is one.
-   procedure Process_Event (Display : in out Display_Type;
-                            Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                            Process : not null access
-                              function (Display : in out Display_Type'Class;
-                                        Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                                        Buttons : in out UI.Buttons.Button_Array)
-                            return UI.Buttons.Button_Event) is abstract;
+   --  Returns True if a refresh is needed.
+   function Need_Refresh (Display : in Display_Type;
+                          Now     : in Ada.Real_Time.Time) return Boolean;
 
    --  Process touch panel event if there is one.
    procedure Process_Event (Display : in out Display_Type;
                             Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
-   --  Refresh the current display.
    procedure Refresh (Display  : in out Display_Type;
                       Buffer   : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                      Deadline : out Ada.Real_Time.Time) is abstract;
+                      Mode     : in Refresh_Mode := REFRESH_CURRENT);
 
-   --  Draw the layout presentation frame.
-   procedure Draw_Frame (Display : in out Display_Type;
-                         Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class) is abstract;
+   procedure On_Pause (Display : in out Display_Type;
+                       Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class) is null;
 
-   --  Draw the display buttons.
-   procedure Draw_Buttons (Display : in out Display_Type;
-                           Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class) is abstract;
+   procedure On_Restore (Display : in out Display_Type;
+                         Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class) is null;
+
+   --  Refresh the current display.
+   procedure On_Refresh (Display  : in out Display_Type;
+                         Buffer   : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                         Deadline : out Ada.Real_Time.Time) is null;
+
+   --  Handle touch events on the display.
+   procedure On_Touch (Display : in out Display_Type;
+                       Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                       States  : in HAL.Touch_Panel.TP_State) is null;
 
    procedure Initialize;
 
@@ -71,6 +77,8 @@ package UI.Displays is
 private
 
    type Display_Type is abstract tagged limited record
+      Current_Buffer : Display_Buffer_Index := 0;
+      Deadline       : Ada.Real_Time.Time;
       Refresh_Flag   : Boolean := True;
       Button_Changed : Boolean := True;
       Previous       : access Display_Type;
