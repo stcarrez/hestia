@@ -16,11 +16,13 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with HAL.Bitmap;
+with HAL.Touch_Panel;
 with Ada.Real_Time;
 with Net;
 
 with UI.Buttons;
 with UI.Graphs;
+with UI.Displays;
 package Hestia.Display is
 
    --  Color to draw a separation line.
@@ -28,14 +30,11 @@ package Hestia.Display is
    Hot_Color  : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Red;
    Cold_Color : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
 
+private
+
    B_MAIN  : constant UI.Buttons.Button_Index := 1;
    B_SETUP : constant UI.Buttons.Button_Index := 2;
    B_STAT  : constant UI.Buttons.Button_Index := 3;
-
-   Buttons : UI.Buttons.Button_Array (B_MAIN .. B_STAT) :=
-     (B_MAIN  => (Name => "Main ", State => UI.Buttons.B_PRESSED, others => <>),
-      B_SETUP => (Name => "Setup", others => <>),
-      B_STAT  => (Name => "Stats", others => <>));
 
    package Use_Graph is new UI.Graphs (Value_Type => Net.Uint64,
                                        Graph_Size => 1024);
@@ -55,9 +54,9 @@ package Hestia.Display is
 
    --  Draw the layout presentation frame.
    procedure Draw_Frame (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
-
-   --  Draw the display buttons.
-   procedure Draw_Buttons (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
+--
+--     --  Draw the display buttons.
+--     procedure Draw_Buttons (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Refresh the graph and draw it.
    procedure Refresh_Graphs (Buffer     : in out HAL.Bitmap.Bitmap_Buffer'Class;
