@@ -38,6 +38,11 @@ package body Hestia.Display is
    function To_Digits (Val : Natural) return String;
    function To_String (H, M, S : Natural) return String;
 
+   Buttons : UI.Buttons.Button_Array (B_MAIN .. B_STAT) :=
+     (B_MAIN  => (Name => "Main ", State => UI.Buttons.B_PRESSED, others => <>),
+      B_SETUP => (Name => "Setup", others => <>),
+      B_STAT  => (Name => "Stats", others => <>));
+
    --  Kb, Mb, Gb units.
    KB : constant Net.Uint64 := 1024;
    MB : constant Net.Uint64 := KB * KB;
@@ -124,19 +129,6 @@ package body Hestia.Display is
    end Initialize;
 
    --  ------------------------------
-   --  Draw the layout presentation frame.
-   --  ------------------------------
-   procedure Draw_Frame (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
-   begin
-      Buffer.Set_Source (UI.Texts.Background);
-      Buffer.Fill;
-      Draw_Buttons (Buffer);
-      Buffer.Set_Source (Line_Color);
-      Buffer.Draw_Vertical_Line (Pt     => (98, 0),
-                                 Height => Buffer.Height);
-   end Draw_Frame;
-
-   --  ------------------------------
    --  Draw the display buttons.
    --  ------------------------------
    procedure Draw_Buttons (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
@@ -148,6 +140,19 @@ package body Hestia.Display is
                                Width  => 95,
                                Height => 34);
    end Draw_Buttons;
+
+   --  ------------------------------
+   --  Draw the layout presentation frame.
+   --  ------------------------------
+   procedure Draw_Frame (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class) is
+   begin
+      Buffer.Set_Source (UI.Texts.Background);
+      Buffer.Fill;
+      Draw_Buttons (Buffer);
+      Buffer.Set_Source (Line_Color);
+      Buffer.Draw_Vertical_Line (Pt     => (98, 0),
+                                 Height => Buffer.Height);
+   end Draw_Frame;
 
    --  ------------------------------
    --  Refresh the graph and draw it.
@@ -250,10 +255,11 @@ package body Hestia.Display is
          Deadline := Ada.Real_Time.Clock + Ada.Real_Time.Microseconds (Integer (W));
 
          UI.Texts.Current_Font := BMP_Fonts.Font16x24;
-         UI.Texts.Draw_String (Buffer, (105, 60), 175, To_String (T.Hour, T.Minute, T.Second));
-         UI.Texts.Draw_String (Buffer, (105, 30), 175, Natural'Image (T.Year));
-         UI.Texts.Draw_String (Buffer, (205, 30), 175, Natural'Image (T.Day));
-         UI.Texts.Draw_String (Buffer, (300, 30), 175, Hestia.Time.Month_Names (T.Month));
+         UI.Texts.Draw_String (Buffer, (30, 10), 128, Hestia.Time.Day_Names (T.Week_Day));
+         UI.Texts.Draw_String (Buffer, (140, 10), 128, Natural'Image (T.Day));
+         UI.Texts.Draw_String (Buffer, (200, 10), 128,
+                               Hestia.Time.Month_Names (T.Month) (1 .. 3));
+         UI.Texts.Draw_String (Buffer, (300, 10), 175, To_String (T.Hour, T.Minute, T.Second));
          UI.Texts.Current_Font := BMP_Fonts.Font12x12;
       end if;
    end Display_Time;
