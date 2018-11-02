@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  hestia-time -- Date and time information
---  Copyright (C) 2017 Stephane Carrez
+--  Copyright (C) 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,7 +74,7 @@ package body Hestia.Time is
       Result.Year := Natural (4 * Four_Year_Segs + Rem_Years) + 1970;
 
       --  Compute year day.
-      Year_Day := Natural (S / Secs_In_Day);
+      Year_Day := 1 + Natural (S / Secs_In_Day);
       Result.Year_Day := Year_Day;
 
       --  Compute month and day of month.
