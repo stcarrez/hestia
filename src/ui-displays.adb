@@ -32,77 +32,87 @@ package body UI.Displays is
       STM32.Board.Touch_Panel.Initialize;
    end Initialize;
 
+   --  Get the index of current buffer visible on screen.
+   function Current_Buffer_Index (Display : in Display_Type) return Display_Buffer_Index
+     is (Display.Current_Buffer);
+
    --  ------------------------------
    --  Returns True if a refresh is needed.
    --  ------------------------------
-   function Need_Refresh (Display : in Display_Type) return Boolean is
+   function Need_Refresh (Display : in Display_Type;
+                          Now     : in Ada.Real_Time.Time) return Boolean is
+      use type Ada.Real_Time.Time;
    begin
-      return Display.Refresh_Flag;
+      return Display.Deadline < Now or Display.Refresh_Flag;
    end Need_Refresh;
-
-   function Handle_Buttons (Display : in out Display_Type'Class;
-                            Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                            List    : in out UI.Buttons.Button_Array)
-                            return UI.Buttons.Button_Event is
-      use type UI.Buttons.Button_Event;
-
-      Event : UI.Buttons.Button_Event;
-   begin
-      UI.Buttons.Get_Event (Buffer => Buffer,
-                            Touch  => STM32.Board.Touch_Panel,
-                            List   => List,
-                            Event  => Event);
-      if Event /= UI.Buttons.NO_EVENT then
-         UI.Buttons.Set_Active (List, Event, Display.Button_Changed);
-
-         --  Update the buttons in the first layer.
-         if Display.Button_Changed then
-            Display.Draw_Buttons (Buffer);
-         end if;
-      end if;
-      return Event;
-   end Handle_Buttons;
 
    --  ------------------------------
    --  Process touch panel event if there is one.
    --  ------------------------------
    procedure Process_Event (Display : in out Display_Type;
                             Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class) is
-
+      State : constant HAL.Touch_Panel.TP_State := STM32.Board.Touch_Panel.Get_All_Touch_Points;
    begin
-      --  We updated the buttons in the previous layer and
-      --  we must update them in the second one.
-      if Display.Button_Changed then
-         Display_Type'Class (Display).Draw_Buttons (Buffer);
-         Display.Button_Changed := False;
+      Display.Refresh_Flag := False;
+
+      if State'Length > 0 then
+         Display_Type'Class (Display).On_Touch (Buffer, State);
       end if;
 
-      Display_Type'Class (Display).Process_Event (Buffer  => Buffer,
-                                                  Process => Handle_Buttons'Access);
-
-      --  Update the buttons in the first layer.
-      if Display.Button_Changed then
-         Display_Type'Class (Display).Draw_Buttons (Buffer);
-      end if;
    end Process_Event;
 
    Top_Display : access Display_Type'Class;
+
+   procedure Refresh (Display : in out Display_Type;
+                      Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                      Mode    : in Refresh_Mode := REFRESH_CURRENT) is
+   begin
+      Display_Type'Class (Display).On_Refresh (Buffer, Display.Deadline);
+      Display.Refresh_Flag := False;
+      STM32.Board.Display.Update_Layer (1);
+      Display.Current_Buffer := (if Display.Current_Buffer = 1 then 0 else 1);
+   end Refresh;
+
+   --  ------------------------------
+   --  Restore and refresh the two buffers.
+   --  ------------------------------
+   procedure Restore (Display : in Display_Access) is
+      Buffer  : HAL.Bitmap.Any_Bitmap_Buffer;
+   begin
+      for I in 1 .. 2 loop
+         Buffer := STM32.Board.Display.Hidden_Buffer (1);
+         Display.On_Restore (Buffer.all);
+         Display.Refresh (Buffer.all);
+      end loop;
+   end Restore;
 
    --  ------------------------------
    --  Push a new display.
    --  ------------------------------
    procedure Push_Display (Display : in Display_Access) is
+      Buffer  : constant HAL.Bitmap.Any_Bitmap_Buffer := STM32.Board.Display.Hidden_Buffer (1);
    begin
-      Display.Previous := Display;
+      if Top_Display /= null then
+         Top_Display.On_Pause (Buffer.all);
+      end if;
+      Display.Previous := Top_Display;
       Top_Display := Display;
+      Restore (Display);
    end Push_Display;
 
    --  ------------------------------
    --  Pop the display to go back to the previous one.
    --  ------------------------------
    procedure Pop_Display is
+      Buffer  : constant HAL.Bitmap.Any_Bitmap_Buffer := STM32.Board.Display.Hidden_Buffer (1);
    begin
-      Top_Display := Top_Display.Previous;
+      if Top_Display /= null then
+         Top_Display.On_Pause (Buffer.all);
+      end if;
+      if Top_Display.Previous /= null then
+         Top_Display := Top_Display.Previous;
+      end if;
+      Restore (Top_Display.all'Access);
    end Pop_Display;
 
    --  ------------------------------
