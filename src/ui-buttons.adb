@@ -19,6 +19,16 @@ with Bitmapped_Drawing;
 with BMP_Fonts;
 package body UI.Buttons is
 
+   --  ------------------------------
+   --  Returns True if the button contains the given point.
+   --  ------------------------------
+   function Contains (Button : in Button_Type;
+                      X, Y   : in Natural) return Boolean is
+   begin
+      return X >= Button.Pos.X and Y >= Button.Pos.Y
+        and X < Button.Pos.X + Button.Width
+        and Y < Button.Pos.Y + Button.Height;
+   end Contains;
 
    --  ------------------------------
    --  Draw the button in its current state on the bitmap.
@@ -45,7 +55,7 @@ package body UI.Buttons is
       Bitmapped_Drawing.Draw_String
         (Buffer,
          Start      => (Button.Pos.X + 4, Button.Pos.Y + 6),
-         Msg        => Button.Name,
+         Msg        => Button.Name (1 .. Button.Len),
          Font       => BMP_Fonts.Font16x24,
          Foreground => (if Button.State = B_RELEASED then Foreground else Active_Foreground),
          Background => Color);
