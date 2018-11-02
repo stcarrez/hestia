@@ -31,6 +31,7 @@ package UI.Buttons is
 
    type Button_Type is record
       Name   : String (1 .. 5);
+      Len    : Natural := 5;
       Pos    : HAL.Bitmap.Point := (0, 0);
       Width  : Positive;
       Height : Positive;
@@ -44,6 +45,10 @@ package UI.Buttons is
    type Button_Array is array (Button_Index range <>) of Button_Type;
 
    NO_EVENT : constant Button_Event := 0;
+
+   --  Returns True if the button contains the given point.
+   function Contains (Button : in Button_Type;
+                      X, Y   : in Natural) return Boolean;
 
    --  Draw the button in its current state on the bitmap.
    procedure Draw_Button (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class;
