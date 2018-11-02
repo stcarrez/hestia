@@ -19,9 +19,72 @@ with Bitmapped_Drawing;
 with Bitmap_Color_Conversion;
 with BMP_Fonts;
 with UI.Texts;
+with Cosin_Table;
 package body UI.Clocks is
 
    use Bitmapped_Drawing;
+
+   CLOCK_THICKNESS   : constant Natural := 5;
+   TICK_OFFSET       : constant Natural := 10;
+   TICK_LENGTH       : constant Natural := 5;
+   TEXT_OFFSET       : constant Natural := TICK_OFFSET + TICK_LENGTH + 10;
+   CLOCK_TICK_OFFSET : constant Natural := TEXT_OFFSET + 5;
+
+   procedure Draw_Clock_Tick (Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                              Center  : in HAL.Bitmap.Point;
+                              Width   : in Natural;
+                              Hour    : in Natural;
+                              Minute  : in Natural;
+                              Second  : in Natural;
+                              Hand    : in Hand_Type) is
+      Pos      : Natural := ((Hour mod 12) * 60) + Minute;
+      Quadrant : Natural := Pos / 180;
+      Radius   : Natural := Width - CLOCK_TICK_OFFSET;
+      R_Sin    : Natural;
+      R_Cos    : Natural;
+      X, Y     : Natural;
+   begin
+      case Hand is
+         when HOUR_HAND =>
+            Pos := ((Hour mod 12) * 60) + Minute;
+
+         when MINUTE_HAND =>
+            Pos := Minute * 12 + (Second * 12) / 60;
+            Radius := Radius - 10;
+
+         when SECOND_HAND =>
+            Pos := Second * 12;
+      end case;
+
+      Quadrant := Pos / 180;
+      Pos := Pos mod 180;
+      R_Sin := (Cosin_Table.Sin_Table (Pos) * Radius) / Cosin_Table.Factor;
+      R_Cos := (Cosin_Table.Cos_Table (Pos) * Radius) / Cosin_Table.Factor;
+      case Quadrant is
+         when 0 =>
+            X := Center.X + R_Sin;
+            Y := Center.Y - R_Cos;
+
+         when 1 =>
+            X := Center.X + R_Cos;
+            Y := Center.Y + R_Sin;
+
+         when 2 =>
+            X := Center.X - R_Sin;
+            Y := Center.Y + R_Cos;
+
+         when 3 =>
+            X := Center.X - R_Cos;
+            Y := Center.Y - R_Sin;
+
+         when others =>
+            return;
+      end case;
+      Buffer.Set_Source (UI.Texts.Foreground);
+      Buffer.Draw_Line (Start => (Center.X, Center.Y),
+                        Stop  => (X, Y));
+      Buffer.Fill_Circle (Center => (X, Y), Radius => 3);
+   end Draw_Clock_Tick;
 
    --  ------------------------------
    --  Draw the 12 hour clock at the given center position and with the given width.
@@ -29,11 +92,6 @@ package body UI.Clocks is
    procedure Draw_Clock (Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
                          Center  : in HAL.Bitmap.Point;
                          Width   : in Natural) is
-
-      CLOCK_THICKNESS : constant Natural := 5;
-      TICK_OFFSET     : constant Natural := 10;
-      TICK_LENGTH     : constant Natural := 5;
-      TEXT_OFFSET     : constant Natural := TICK_OFFSET + TICK_LENGTH + 10;
 
       FG    : constant HAL.UInt32
         := Bitmap_Color_Conversion.Bitmap_Color_To_Word (Buffer.Color_Mode,
