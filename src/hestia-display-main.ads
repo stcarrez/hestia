@@ -16,53 +16,47 @@
 --  limitations under the License.
 -----------------------------------------------------------------------
 with HAL.Bitmap;
+with HAL.Touch_Panel;
 with Ada.Real_Time;
-with Net;
 
+with Hestia.Time;
 with UI.Buttons;
 with UI.Displays;
 package Hestia.Display.Main is
 
-   type Display_Type is new UI.Displays.Display_Type with null record;
-
-   --  Process touch panel event if there is one.
-   overriding
-   procedure Process_Event (Display : in out Display_Type;
-                            Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                            Process : not null access
-                              function (Display : in out UI.Displays.Display_Type'Class;
-                                        Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                                        Buttons : in out UI.Buttons.Button_Array)
-                            return UI.Buttons.Button_Event);
+   type Display_Type is limited new UI.Displays.Display_Type with private;
 
    --  Draw the layout presentation frame.
    overriding
-   procedure Draw_Frame (Display : in out Display_Type;
+   procedure On_Restore (Display : in out Display_Type;
                          Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class);
-
-   --  Draw the display buttons.
-   overriding
-   procedure Draw_Buttons (Display : in out Display_Type;
-                           Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class);
 
    --  Refresh the current display.
    overriding
-   procedure Refresh (Display  : in out Display_Type;
-                      Buffer   : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                      Deadline : out Ada.Real_Time.Time);
+   procedure On_Refresh (Display  : in out Display_Type;
+                         Buffer   : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                         Deadline : out Ada.Real_Time.Time);
 
-   --  Display the current heat schedule and status.
-   procedure Display_Main (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
-
-   Display : aliased Display_Type;
+   --  Handle touch events on the display.
+   overriding
+   procedure On_Touch (Display : in out Display_Type;
+                       Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                       States  : in HAL.Touch_Panel.TP_State);
 
 private
 
-   B_ZONE_1  : constant UI.Buttons.Button_Index := 1;
-   B_ZONE_2  : constant UI.Buttons.Button_Index := 2;
+   type Display_Info is limited record
+      Hour   : Hestia.Time.Hour_Number   := 0;
+      Minute : Hestia.Time.Minute_Number := 0;
+   end record;
 
-   Buttons : UI.Buttons.Button_Array (B_ZONE_1 .. B_ZONE_2) :=
-     (B_ZONE_1 => (Name => "ON   ", State => UI.Buttons.B_PRESSED, others => <>),
-      B_ZONE_2 => (Name => "ON   ", others => <>));
+   type Display_Info_Array is array (UI.Displays.Display_Buffer_Index) of Display_Info;
+
+   type Display_Type is limited new UI.Displays.Display_Type with record
+      Info         : Display_Info_Array;
+      Zone1_Button : UI.Buttons.Button_Type;
+      Zone2_Button : UI.Buttons.Button_Type;
+      Info_Button  : UI.Buttons.Button_Type;
+   end record;
 
 end Hestia.Display.Main;
