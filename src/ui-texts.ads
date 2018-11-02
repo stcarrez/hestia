@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------
 --  ui-texts -- Utilities to draw text strings
---  Copyright (C) 2016, 2017 Stephane Carrez
+--  Copyright (C) 2016, 2017, 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ with HAL.Bitmap;
 with BMP_Fonts;
 package UI.Texts is
 
-   type Justify_Type is (LEFT, RIGHT);  --  CENTER is left as an exercise to the reader.
+   type Justify_Type is (LEFT, RIGHT, CENTER);
 
    Foreground   : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.White;
    Background   : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Black;
