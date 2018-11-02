@@ -18,6 +18,16 @@
 with HAL.Bitmap;
 package UI.Clocks is
 
+   type Hand_Type is (HOUR_HAND, MINUTE_HAND, SECOND_HAND);
+
+   procedure Draw_Clock_Tick (Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
+                              Center  : in HAL.Bitmap.Point;
+                              Width   : in Natural;
+                              Hour    : in Natural;
+                              Minute  : in Natural;
+                              Second  : in Natural;
+                              Hand    : in Hand_Type);
+
    --  Draw the 12 hour clock at the given center position and with the given width.
    procedure Draw_Clock (Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
                          Center  : in HAL.Bitmap.Point;
