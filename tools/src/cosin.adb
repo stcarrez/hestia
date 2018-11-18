@@ -1,5 +1,5 @@
 -----------------------------------------------------------------------
---  ado-utils-streams -- IO stream utilities
+--  cosin -- Generate a sinus/cosinus table
 --  Copyright (C) 2018 Stephane Carrez
 --  Written by Stephane Carrez (Stephane.Carrez@gmail.com)
 --
