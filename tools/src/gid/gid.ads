@@ -20,7 +20,7 @@
 --
 -- Credits:
 --
---   - André van Splunter: GIF's LZW decoder in Ada
+--   - AndrÃ© van Splunter: GIF's LZW decoder in Ada
 --   - Martin J. Fiedler: most of the JPEG decoder (from NanoJPEG)
 --
 --   More credits in gid_work.xls, sheet "credits".
@@ -155,6 +155,10 @@ package GID is
   function Greyscale (image: Image_descriptor) return Boolean;
   function Has_palette (image: Image_descriptor) return Boolean;
   function Expect_transparency (image: Image_descriptor) return Boolean;
+
+   generic
+      with procedure Get_color (Red, Green, Blue : Interfaces.Unsigned_8);
+  procedure Get_palette (image : Image_descriptor);
 
   ----------------------------------------------------------------
   --  Information about this package - e.g. for an "about" box  --
