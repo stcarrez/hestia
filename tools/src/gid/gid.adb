@@ -219,6 +219,15 @@ package body GID is
     return image.transparency;
   end Expect_transparency;
 
+   procedure Get_palette (image : Image_descriptor) is
+   begin
+      if image.palette /= null then
+         for C of image.palette.all loop
+            Get_color (C.red, C.green, C.red);
+         end loop;
+      end if;
+   end Get_palette;
+
   procedure Adjust (Object : in out Image_descriptor) is
   begin
     -- Clone the palette
