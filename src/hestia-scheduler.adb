@@ -18,6 +18,9 @@
 with UI.Texts;
 package body Hestia.Scheduler is
 
+   use type Hestia.Time.Day_Name;
+   use type Hestia.Time.Minute_Number;
+
    type Schedule_Array_Type is array (Scheduler_Index) of Schedule_Type;
 
    Zones : Schedule_Array_Type;
@@ -29,6 +32,65 @@ package body Hestia.Scheduler is
    Cold_Color       : constant HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
    Now_Color        : constant HAL.Bitmap.Bitmap_Color := HAL.Bitmap.White_Smoke;
 
+   --  ------------------------------
+   --  Compare two scheduler day and time.
+   --  ------------------------------
+   function "<" (Left, Right : in Day_Time) return Boolean is
+   begin
+      if Left.Day < Right.Day then
+         return True;
+      elsif Left.Day > Right.Day then
+         return False;
+      elsif Left.Hour < Right.Hour then
+         return True;
+      elsif Left.Hour > Right.Hour then
+         return False;
+      else
+         return Left.Minute < Right.Minute;
+      end if;
+   end "<";
+
+   --  ------------------------------
+   --  Add some minutes to the scheduler day and time.
+   --  ------------------------------
+   function "+" (Date    : in Day_Time;
+                 Minutes : in Hestia.Time.Minute_Number) return Day_Time is
+      Result : Day_Time := Date;
+   begin
+      if Date.Minute + Minutes > 60 then
+         Result.Minute := Result.Minute + Minutes - 60;
+         if Result.Hour = 23 then
+            Result.Hour := 0;
+            if Result.Day = Hestia.Time.Day_Name'Last then
+               Result.Day := Hestia.Time.Day_Name'First;
+            else
+               Result.Day := Hestia.Time.Day_Name'Succ (Result.Day);
+            end if;
+         else
+            Result.Hour := Result.Hour + 1;
+         end if;
+      else
+         Result.Minute := Result.Minute + Minutes;
+      end if;
+      return Result;
+   end "+";
+
+   --  ------------------------------
+   --  Subtract two scheduler day and time and get the difference in minutes.
+   --  ------------------------------
+   function "-" (Left, Right : in Day_Time) return Integer is
+      Result : Integer := 0;
+   begin
+      if Left.Hour < Right.Hour then
+         Result := (Left.Hour - Right.Hour) * 60;
+         Result := Result + (Left.Minute - Right.Minute);
+      else
+         Result := (Left.Hour - Right.Hour) * 60;
+         Result := Result + (Left.Minute - Right.Minute);
+      end if;
+      return Result;
+   end "-";
+
    function Get_State (Date : in Hestia.Time.Date_Time;
                        Zone : in Scheduler_Index) return State_Type is
       Pos : Schedule_Unit;
@@ -36,6 +98,29 @@ package body Hestia.Scheduler is
       Pos := Schedule_Unit (Date.Hour * 12) + Schedule_Unit (Date.Minute / 5);
       return Zones (Zone).Week (Date.Week_Day) (Pos);
    end Get_State;
+
+   --  ------------------------------
+   --  Get the scheduler state for the given day and time.
+   --  ------------------------------
+   function Get_State (Date : in Day_Time;
+                       Zone : in Scheduler_Index) return State_Type is
+      Pos : Schedule_Unit;
+   begin
+      Pos := Schedule_Unit (Date.Hour * 12) + Schedule_Unit (Date.Minute / 5);
+      return Zones (Zone).Week (Date.Day) (Pos);
+   end Get_State;
+
+   --  ------------------------------
+   --  Set the scheduler state for the given day and time.
+   --  ------------------------------
+   procedure Set_State (Date  : in Day_Time;
+                        Zone  : in Scheduler_Index;
+                        State : in State_Type) is
+      Pos : Schedule_Unit;
+   begin
+      Pos := Schedule_Unit (Date.Hour * 12) + Schedule_Unit (Date.Minute / 5);
+      Zones (Zone).Week (Date.Day) (Pos) := State;
+   end Set_State;
 
    --  ------------------------------
    --  Display the heat schedule on the display based on the current date and time.
