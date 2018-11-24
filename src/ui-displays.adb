@@ -71,6 +71,9 @@ package body UI.Displays is
       Display.Refresh_Flag := False;
       STM32.Board.Display.Update_Layer (1);
       Display.Current_Buffer := (if Display.Current_Buffer = 1 then 0 else 1);
+      if Mode = REFRESH_BOTH then
+         Display.Refresh (STM32.Board.Display.Hidden_Buffer (1).all, REFRESH_CURRENT);
+      end if;
    end Refresh;
 
    --  ------------------------------
