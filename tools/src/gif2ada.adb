@@ -19,6 +19,7 @@ with Interfaces;
 with Ada.Text_IO;
 with Ada.Streams.Stream_IO;
 with Ada.Command_Line;
+with Ada.Calendar;
 with GID;
 procedure Gif2ada is
    use Interfaces;
@@ -34,12 +35,43 @@ begin
       return;
    end if;
    declare
+
+      subtype Primary_color_range is Unsigned_8;
+
       procedure Get_Color (Red, Green, Blue : Interfaces.Unsigned_8);
+      procedure Set_X_Y (X, Y : in Natural) is null;
+      procedure Put_Pixel (Red, Green, Blue : Primary_color_range;
+                           Alpha            : Primary_color_range) is null;
+      procedure Feedback (Percents : Natural) is null;
+      procedure Raw_Byte (B : in Interfaces.Unsigned_8);
 
       Name : constant String := Ada.Command_Line.Argument (1);
       Path : constant String := Ada.Command_Line.Argument (2);
       File : Ada.Streams.Stream_IO.File_Type;
       Color_Count : Natural := 0;
+      Need_Sep  : Boolean := False;
+      Need_Line : Boolean := False;
+      Count     : Natural := 0;
+
+      procedure Raw_Byte (B : in Interfaces.Unsigned_8) is
+      begin
+         if Need_Sep then
+            Ada.Text_IO.Put (",");
+         end if;
+         if Need_Line then
+            Need_Line := False;
+            Ada.Text_IO.New_Line;
+            Ada.Text_IO.Set_Col (8);
+         end if;
+         Need_Sep := True;
+         Ada.Text_IO.Put (Natural'Image (Natural (B)));
+         Count := Count + 1;
+         Need_Line := (Count mod 8) = 0;
+      end Raw_Byte;
+
+      procedure Load_Image is
+        new GID.Load_image_contents (Primary_color_range, Set_X_Y,
+                                     Put_Pixel, Raw_Byte, Feedback, GID.fast);
 
       procedure Get_Color (Red, Green, Blue : Interfaces.Unsigned_8) is
          Red_Image : constant String := Unsigned_8'Image (Red);
@@ -66,11 +98,7 @@ begin
       procedure Write_Palette is
         new GID.Get_palette (Get_Color);
 
-      Data      : Ada.Streams.Stream_Element_Array (1 .. 16);
-      Last      : Ada.Streams.Stream_Element_Offset;
-      Need_Sep  : Boolean := False;
-      Need_Line : Boolean := False;
-      Count     : Natural := 0;
+      Next_Frame : Ada.Calendar.Day_Duration := 0.0;
    begin
       Ada.Streams.Stream_IO.Open (File, Ada.Streams.Stream_IO.In_File, Path);
       GID.Load_image_header (Image, Ada.Streams.Stream_IO.Stream (File).all);
@@ -91,25 +119,8 @@ begin
       Ada.Text_IO.New_Line;
       Ada.Text_IO.Put_Line ("  Data    : aliased constant UI.Images.Bitmap_Array := (");
       Ada.Text_IO.Put ("       ");
-      while not Ada.Streams.Stream_IO.End_Of_File (File) loop
-         Ada.Streams.Stream_IO.Read (File => File,
-                                     Item => Data,
-                                     Last => Last);
-         for C of Data (Data'First .. Last) loop
-            if Need_Sep then
-               Ada.Text_IO.Put (",");
-            end if;
-            if Need_Line then
-               Need_Line := False;
-               Ada.Text_IO.New_Line;
-               Ada.Text_IO.Set_Col (8);
-            end if;
-            Need_Sep := True;
-            Ada.Text_IO.Put (Natural'Image (Natural (C)));
-            Count := Count + 1;
-         end loop;
-         Need_Line := True;
-      end loop;
+
+      Load_Image (Image, Next_Frame);
       Ada.Streams.Stream_IO.Close (File);
       Ada.Text_IO.Put_Line ("  );");
       Ada.Text_IO.Put_Line ("    -- " & Natural'Image (Count) & " bytes");
