@@ -134,7 +134,7 @@ package body GID is
       new Decoding_BMP.Load( Primary_color_range, Set_X_Y, Put_Pixel, Feedback );
 
     procedure GIF_Load is
-      new Decoding_GIF.Load( Primary_color_range, Set_X_Y, Put_Pixel, Feedback, mode );
+      new Decoding_GIF.Load( Primary_color_range, Set_X_Y, Put_Pixel, Raw_Byte, Feedback, mode );
 
     procedure JPG_Load is
       new Decoding_JPG.Load( Primary_color_range, Set_X_Y, Put_Pixel, Feedback );
@@ -223,7 +223,7 @@ package body GID is
    begin
       if image.palette /= null then
          for C of image.palette.all loop
-            Get_color (C.red, C.green, C.red);
+            Get_color (C.red, C.green, C.blue);
          end loop;
       end if;
    end Get_palette;
