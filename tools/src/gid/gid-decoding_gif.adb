@@ -1,4 +1,4 @@
---  GIF Decoder by André van Splunter
+--  GIF Decoder by AndrÃ© van Splunter
 --
 --  A GIF stream is made of several "blocks".
 --  The image itself is contained in an Image Descriptor block.
@@ -8,6 +8,21 @@ with GID.Buffering, GID.Color_tables;
 with Ada.Exceptions, Ada.Text_IO;
 
 package body GID.Decoding_GIF is
+
+  ----------
+  -- Load --
+  ----------
+
+  procedure Load (
+    image     : in out Image_descriptor;
+    next_frame:    out Ada.Calendar.Day_Duration
+  )
+  is
+    local: Image_descriptor;
+    -- With GIF, each frame is a local image with an eventual
+    -- palette, different dimensions, etc. ...
+
+    use GID.Buffering, Ada.Exceptions;
 
   generic
     type Number is mod <>;
@@ -27,28 +42,14 @@ package body GID.Decoding_GIF is
   begin
     n:= 0;
     for i in 1..Number'Size/8 loop
-      GID.Buffering.Get_Byte(from, b);
+         GID.Buffering.Get_Byte(from, b);
+         Raw_Byte (b);
       n:= n + m * Number(b);
       m:= m * 256;
     end loop;
   end Read_Intel_x86_number;
 
   procedure Read_Intel is new Read_Intel_x86_number( U16 );
-
-  ----------
-  -- Load --
-  ----------
-
-  procedure Load (
-    image     : in out Image_descriptor;
-    next_frame:    out Ada.Calendar.Day_Duration
-  )
-  is
-    local: Image_descriptor;
-    -- With GIF, each frame is a local image with an eventual
-    -- palette, different dimensions, etc. ...
-
-    use GID.Buffering, Ada.Exceptions;
 
     type GIFDescriptor is record
       ImageLeft,
@@ -83,11 +84,13 @@ package body GID.Decoding_GIF is
       b: U8;
     begin
       if block_read >= block_size then
-        Get_Byte(image.buffer, b);
+            Get_Byte(image.buffer, b);
+            Raw_Byte (b);
         block_size:= Natural(b);
         block_read:= 0;
       end if;
-      Get_Byte(image.buffer, b);
+         Get_Byte(image.buffer, b);
+         Raw_Byte (b);
       block_read:= block_read + 1;
       return b;
     end Read_Byte;
@@ -265,7 +268,7 @@ package body GID.Decoding_GIF is
 
     begin -- GIF_Decode
       -- The decoder source and the cool comments are kindly donated by
-      -- André van Splunter.
+      -- AndrÃ© van Splunter.
       --
       CurrSize:= InitCodeSize;
       --  This is the main loop.  For each code we get we pass through the
@@ -385,11 +388,13 @@ package body GID.Decoding_GIF is
     begin
        sub_blocks_sequence:
        loop
-        Get_Byte(image.buffer, temp ); -- load sub-block length byte
+            Get_Byte(image.buffer, temp ); -- load sub-block length byte
+            Raw_Byte(temp);
         exit sub_blocks_sequence when temp = 0;
         -- null sub-block = end of sub-block sequence
         for i in 1..temp loop
-          Get_Byte(image.buffer, temp ); -- load sub-block byte
+               Get_Byte(image.buffer, temp ); -- load sub-block byte
+               Raw_Byte(temp);
         end loop;
       end loop sub_blocks_sequence;
     end Skip_sub_blocks;
@@ -411,7 +416,8 @@ package body GID.Decoding_GIF is
     next_frame:= 0.0;
     -- Scan various GIF blocks, until finding an image
     loop
-      Get_Byte(image.buffer, temp);
+         Get_Byte(image.buffer, temp);
+         Raw_Byte(temp);
       separator:= Character'Val(temp);
       if full_trace then
         Ada.Text_IO.Put(
@@ -435,20 +441,23 @@ package body GID.Decoding_GIF is
           if full_trace then
             Ada.Text_IO.Put(" - Extension");
           end if;
-          Get_Byte(image.buffer, label );
+            Get_Byte(image.buffer, label );
+            Raw_Byte (label);
           case label is
             when 16#F9# => -- See: 23. Graphic Control Extension
               if full_trace then
                 Ada.Text_IO.Put_Line(" - 16#F9#: Graphic Control Extension");
               end if;
-              Get_Byte(image.buffer, temp );
+               Get_Byte(image.buffer, temp );
+               Raw_Byte(temp);
               if temp /= 4 then
                 Raise_Exception(
                   error_in_image_data'Identity,
                   "GIF: error in Graphic Control Extension"
                 );
               end if;
-              Get_Byte(image.buffer, temp );
+               Get_Byte(image.buffer, temp );
+               Raw_Byte(temp);
               --  Reserved                      3 Bits
               --  Disposal Method               3 Bits
               --  User Input Flag               1 Bit
@@ -458,20 +467,24 @@ package body GID.Decoding_GIF is
               image.next_frame:=
                 image.next_frame + Ada.Calendar.Day_Duration(delay_frame) / 100.0;
               next_frame:= image.next_frame;
-              Get_Byte(image.buffer, temp );
+               Get_Byte(image.buffer, temp );
+               Raw_Byte(temp);
               Transp_color:= Color_type(temp);
               -- zero sub-block:
-              Get_Byte(image.buffer, temp );
+               Get_Byte(image.buffer, temp );
+               Raw_Byte(temp);
             when 16#FE# => -- See: 24. Comment Extension
               if full_trace then
                 Ada.Text_IO.Put_Line(" - 16#FE#: Comment Extension");
                 sub_blocks_sequence:
                 loop
-                  Get_Byte(image.buffer, temp ); -- load sub-block length byte
+                     Get_Byte(image.buffer, temp ); -- load sub-block length byte
+                     Raw_Byte(temp);
                   exit sub_blocks_sequence when temp = 0;
                   -- null sub-block = end of sub-block sequence
                   for i in 1..temp loop
-                    Get_Byte(image.buffer, temp2);
+                        Get_Byte(image.buffer, temp2);
+                        Raw_Byte(temp2);
                     c:= Character'Val(temp2);
                     Ada.Text_IO.Put(c);
                   end loop;
@@ -516,7 +529,8 @@ package body GID.Decoding_GIF is
     Read_Intel(image.buffer, Descriptor.ImageTop);
     Read_Intel(image.buffer, Descriptor.ImageWidth);
     Read_Intel(image.buffer, Descriptor.ImageHeight);
-    Get_Byte(image.buffer, Descriptor.Depth);
+      Get_Byte(image.buffer, Descriptor.Depth);
+      Raw_Byte(Descriptor.Depth);
 
     -- Get image corner coordinates
     tlX := Natural(Descriptor.ImageLeft);
@@ -567,7 +581,8 @@ package body GID.Decoding_GIF is
     end if;
 
     -- Get initial code size
-    Get_Byte(image.buffer, temp );
+      Get_Byte(image.buffer, temp );
+      Raw_Byte(temp);
     if Natural(temp) not in Code_size_range then
       Raise_Exception(
         error_in_image_data'Identity,
