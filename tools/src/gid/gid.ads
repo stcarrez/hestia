@@ -116,7 +116,10 @@ package GID is
     with procedure Put_Pixel (
       red, green, blue : Primary_color_range;
       alpha            : Primary_color_range
-    );
+                             );
+
+    -- Called with each byte that was read from the image block section.
+    with procedure Raw_Byte (Byte : in Interfaces.Unsigned_8);
     -- When Put_Pixel is called twice without a Set_X_Y inbetween,
     -- the pixel must be displayed on the next X position after the last one.
     -- [ Rationale: if the image lands into an array with contiguous pixels
