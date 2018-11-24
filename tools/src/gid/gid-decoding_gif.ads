@@ -10,7 +10,8 @@ private package GID.Decoding_GIF is
     with procedure Put_Pixel (
       red, green, blue : Primary_color_range;
       alpha            : Primary_color_range
-    );
+                             );
+      with procedure Raw_Byte (Byte : in U8);
     with procedure Feedback (percents: Natural);
     mode: Display_mode;
   --
