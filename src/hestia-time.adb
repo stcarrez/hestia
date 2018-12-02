@@ -41,6 +41,11 @@ package body Hestia.Time is
       return Year mod 400 = 0 or (Year mod 4 = 0 and not (Year mod 100 = 0));
    end Is_Leap;
 
+   function "-" (Left, Right : in Day_Name) return Integer is
+   begin
+      return Day_Name'Pos (Left) - Day_Name'Pos (Right);
+   end "-";
+
    --  ------------------------------
    --  Convert the NTP time reference to a date.
    --  ------------------------------
