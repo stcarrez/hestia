@@ -1,3 +1,9 @@
 [submodule "ada-enet"]
 	path = ada-enet
 	url = https://github.com/stcarrez/ada-enet.git
+[submodule "stm32-ui"]
+	path = stm32-ui
+	url = https://github.com/stcarrez/stm32-ui.git
+[submodule "Ada_Drivers_Library"]
+	path = Ada_Drivers_Library
+	url = https://github.com/adacore/Ada_Drivers_Library
