@@ -27,6 +27,8 @@ package Hestia.Time is
    subtype Second_Number   is Natural range 0 .. 59;
    subtype Year_Number     is Natural range 1901 .. 2399;
 
+   function "-" (Left, Right : in Day_Name) return Integer;
+
    type Time_Offset is range -(28 * 60) .. 28 * 60;
 
    type Date_Time is record
