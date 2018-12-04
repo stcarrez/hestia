@@ -118,14 +118,6 @@ package body Hestia.Display is
       --  Initialize touch panel
       STM32.Board.Touch_Panel.Initialize;
 
-      for I in Graphs'Range loop
-         Use_Graph.Initialize (Graphs (I),
-                               X      => 100,
-                               Y      => 200,
-                               Width  => 380,
-                               Height => 72,
-                               Rate   => Ada.Real_Time.Milliseconds (1000));
-      end loop;
    end Initialize;
 
    --  ------------------------------
@@ -153,20 +145,6 @@ package body Hestia.Display is
       Buffer.Draw_Vertical_Line (Pt     => (98, 0),
                                  Height => Buffer.Height);
    end Draw_Frame;
-
-   --  ------------------------------
-   --  Refresh the graph and draw it.
-   --  ------------------------------
-   procedure Refresh_Graphs (Buffer     : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                             Graph_Mode : in Graph_Kind) is
---        Now     : constant Ada.Real_Time.Time := Ada.Real_Time.Clock;
-   begin
---        EtherScope.Analyzer.Base.Update_Graph_Samples (Samples, True);
---        for I in Samples'Range loop
---           Use_Graph.Add_Sample (Graphs (I), Samples (I), Now);
---        end loop;
-      Use_Graph.Draw (Buffer, Graphs (Graph_Mode));
-   end Refresh_Graphs;
 
    --  ------------------------------
    --  Display the current heat schedule and status.
