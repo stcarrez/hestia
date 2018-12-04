@@ -54,24 +54,23 @@ package body Hestia.Scheduler is
    --  Add some minutes to the scheduler day and time.
    --  ------------------------------
    function "+" (Date    : in Day_Time;
-                 Minutes : in Hestia.Time.Minute_Number) return Day_Time is
+                 Minutes : in Natural) return Day_Time is
+      use Hestia.Time;
       Result : Day_Time := Date;
+      Mins   : Natural := (Date.Minute + Minutes) mod 60;
+      Hours  : Natural := Date.Hour + ((Date.Minute + Minutes) / 60);
+      Days   : Natural := Hours / 24;
    begin
-      if Date.Minute + Minutes > 60 then
-         Result.Minute := Result.Minute + Minutes - 60;
-         if Result.Hour = 23 then
-            Result.Hour := 0;
-            if Result.Day = Hestia.Time.Day_Name'Last then
-               Result.Day := Hestia.Time.Day_Name'First;
-            else
-               Result.Day := Hestia.Time.Day_Name'Succ (Result.Day);
-            end if;
+      while Days > 0 loop
+         if Result.Day = Day_Name'Last then
+            Result.Day := Day_Name'First;
          else
-            Result.Hour := Result.Hour + 1;
+            Result.Day := Day_Name'Succ (Result.Day);
          end if;
-      else
-         Result.Minute := Result.Minute + Minutes;
-      end if;
+         Days := Days - 1;
+      end loop;
+      Result.Hour := Hours mod 24;
+      Result.Minute := Mins;
       return Result;
    end "+";
 
@@ -79,17 +78,26 @@ package body Hestia.Scheduler is
    --  Subtract two scheduler day and time and get the difference in minutes.
    --  ------------------------------
    function "-" (Left, Right : in Day_Time) return Integer is
-      Result : Integer := 0;
+      use Hestia.Time;
+      L1 : Natural := Day_Name'Pos (Left.Day) * 24 * 60 + Left.Hour * 60 + Left.Minute;
+      L2 : Natural := Day_Name'Pos (Right.Day) * 24 * 60 + Right.Hour * 60 + Right.Minute;
    begin
-      if Left.Hour < Right.Hour then
-         Result := (Left.Hour - Right.Hour) * 60;
-         Result := Result + (Left.Minute - Right.Minute);
-      else
-         Result := (Left.Hour - Right.Hour) * 60;
-         Result := Result + (Left.Minute - Right.Minute);
-      end if;
-      return Result;
+      return L1 - L2;
    end "-";
+
+   --  ------------------------------
+   --  Format the time.
+   --  ------------------------------
+   function Format_Time (Date : in Day_Time) return String is
+      H : constant String := Hestia.Time.Hour_Number'Image (Date.Hour);
+      M : String := Hestia.Time.Minute_Number'Image (Date.Minute);
+   begin
+      if Date.Minute < 10 then
+         return H (H'First + 1 .. H'Last) & ":0" & M (M'First + 1 .. M'Last);
+      else
+         return H (H'First + 1 .. H'Last) & ":" & M (M'First + 1 .. M'Last);
+      end if;
+   end Format_Time;
 
    function Get_State (Date : in Hestia.Time.Date_Time;
                        Zone : in Scheduler_Index) return State_Type is
