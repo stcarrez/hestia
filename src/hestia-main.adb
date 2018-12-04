@@ -58,7 +58,7 @@ begin
          Buffer  : constant HAL.Bitmap.Any_Bitmap_Buffer := STM32.Board.Display.Hidden_Buffer (1);
          Display : UI.Displays.Display_Access := UI.Displays.Current_Display;
       begin
-         Display.Process_Event (Buffer.all);
+         Display.Process_Event (Buffer.all, Now);
 
          --  Refresh the display only when it needs.
          Display := UI.Displays.Current_Display;
