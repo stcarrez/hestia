@@ -37,10 +37,13 @@ package Hestia.Scheduler is
 
    --  Add some minutes to the scheduler day and time.
    function "+" (Date    : in Day_Time;
-                 Minutes : in Hestia.Time.Minute_Number) return Day_Time;
+                 Minutes : in Natural) return Day_Time;
 
    --  Subtract two scheduler day and time and get the difference in minutes.
    function "-" (Left, Right : in Day_Time) return Integer;
+
+   --  Format the time.
+   function Format_Time (Date : in Day_Time) return String;
 
    Unit : constant Hestia.Time.Minute_Number;
 
