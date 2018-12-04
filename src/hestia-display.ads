@@ -29,6 +29,7 @@ package Hestia.Display is
    Line_Color : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
    Hot_Color  : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Red;
    Cold_Color : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Blue;
+   Line_Sep_Color : HAL.Bitmap.Bitmap_Color := HAL.Bitmap.Royal_Blue;
 
 private
 
@@ -36,15 +37,6 @@ private
    B_SETUP : constant UI.Buttons.Button_Index := 2;
    B_STAT  : constant UI.Buttons.Button_Index := 3;
 
-   package Use_Graph is new UI.Graphs (Value_Type => Net.Uint64,
-                                       Graph_Size => 1024);
-   subtype Graph_Type is Use_Graph.Graph_Type;
-
-   type Graph_Kind is (G_ZONE1, G_ZONE2);
-
-   type Graph_Array is array (Graph_Kind) of Graph_Type;
-
-   Graphs  : Graph_Array;
    function Format_Packets (Value : in Net.Uint32) return String;
    function Format_Bytes (Value : in Net.Uint64) return String;
    function Format_Bandwidth (Value : in Net.Uint32) return String;
@@ -54,13 +46,6 @@ private
 
    --  Draw the layout presentation frame.
    procedure Draw_Frame (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
---
---     --  Draw the display buttons.
---     procedure Draw_Buttons (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
-
-   --  Refresh the graph and draw it.
-   procedure Refresh_Graphs (Buffer     : in out HAL.Bitmap.Bitmap_Buffer'Class;
-                             Graph_Mode : in Graph_Kind);
 
    --  Display the current heat schedule and status.
    procedure Display_Main (Buffer : in out HAL.Bitmap.Bitmap_Buffer'Class);
