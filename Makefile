@@ -2,12 +2,18 @@
 
 GPRBUILD=gprbuild --target=arm-eabi
 
-all:  hestia
+all:  hestia gallery
 
 ada-enet/anet_stm32fxxx.gpr:
-	cd ada-enet && ./configure --with-board=stm32f746
+	cd ada-enet && ./configure --with-board=stm32f746 --with-ada-drivers=../Ada_Drivers_Library
 
-hestia: ada-enet/anet_stm32fxxx.gpr
+stm32-ui/ui_stm32fxxx.gpr:
+	cd stm32-ui && ./configure --with-board=stm32f746 --with-ada-drivers=../Ada_Drivers_Library
+
+stm32-ui/stamp-gui: stm32-ui/ui_stm32fxxx.gpr
+	cd stm32-ui && make stamp-gui
+
+hestia: ada-enet/anet_stm32fxxx.gpr stm32-ui/ui_stm32fxxx.gpr stm32-ui/stamp-gui
 	$(GPRBUILD) -Phestia -p -cargs -mno-unaligned-access
 	arm-eabi-objcopy -O binary obj/stm32f746disco/hestia hestia.bin
 
