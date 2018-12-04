@@ -19,6 +19,7 @@ with BMP_Fonts;
 with UI.Texts;
 with UI.Clocks;
 with Hestia.Display.Instances;
+with Hestia.Display.Scheduler;
 package body Hestia.Display.Main is
 
    procedure Draw_Zone_Button (Buffer  : in out HAL.Bitmap.Bitmap_Buffer'Class;
@@ -79,6 +80,14 @@ package body Hestia.Display.Main is
       Display.Zone2_Button.Width := 60;
       Display.Zone2_Button.Height := 60;
 
+      --  Scheduler buttons
+      Display.Sched1_Button.Pos := (M - 90 - 40, 180 - 40);
+      Display.Sched1_Button.Width := 80;
+      Display.Sched1_Button.Height := 80;
+      Display.Sched2_Button.Pos := (M + 90 - 40, 180 - 40);
+      Display.Sched2_Button.Width := 80;
+      Display.Sched2_Button.Height := 80;
+
       Buffer.Set_Source (UI.Texts.Background);
       Buffer.Fill;
       Buffer.Set_Source (Line_Color);
@@ -134,6 +143,17 @@ package body Hestia.Display.Main is
          Display.Zone2_Button.State
            := (if Display.Zone2_Button.State = B_PRESSED then B_RELEASED else B_PRESSED);
          Display.Refresh (Buffer, UI.Displays.REFRESH_BOTH);
+
+         --  Schedule 1
+      elsif UI.Buttons.Contains (Display.Sched1_Button, X, Y) then
+         Instances.Scheduler_Display.Set_Zone (1);
+         UI.Displays.Push_Display (Instances.Scheduler_Display'Access);
+
+         --  Schedule 2
+      elsif UI.Buttons.Contains (Display.Sched2_Button, X, Y) then
+         Instances.Scheduler_Display.Set_Zone (2);
+         UI.Displays.Push_Display (Instances.Scheduler_Display'Access);
+
       end if;
    end On_Touch;
 
