@@ -18,9 +18,11 @@
 
 with Hestia.Display.Main;
 with Hestia.Display.Info;
+with Hestia.Display.Scheduler;
 package Hestia.Display.Instances is
 
-   Display      : aliased Main.Display_Type;
-   Info_Display : aliased Info.Display_Type;
+   Display           : aliased Main.Display_Type;
+   Info_Display      : aliased Info.Display_Type;
+   Scheduler_Display : aliased Scheduler.Display_Type;
 
 end Hestia.Display.Instances;
