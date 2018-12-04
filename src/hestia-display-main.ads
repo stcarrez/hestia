@@ -53,10 +53,12 @@ private
    type Display_Info_Array is array (UI.Displays.Display_Buffer_Index) of Display_Info;
 
    type Display_Type is limited new UI.Displays.Display_Type with record
-      Info         : Display_Info_Array;
-      Zone1_Button : UI.Buttons.Button_Type;
-      Zone2_Button : UI.Buttons.Button_Type;
-      Info_Button  : UI.Buttons.Button_Type;
+      Info          : Display_Info_Array;
+      Zone1_Button  : UI.Buttons.Button_Type;
+      Zone2_Button  : UI.Buttons.Button_Type;
+      Info_Button   : UI.Buttons.Button_Type;
+      Sched1_Button : UI.Buttons.Button_Type;
+      Sched2_Button : UI.Buttons.Button_Type;
    end record;
 
 end Hestia.Display.Main;
